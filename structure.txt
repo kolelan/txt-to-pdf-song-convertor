@@ -1,0 +1,23 @@
+src/
+├── components/
+│   ├── Editor/
+│   │   ├── Editor.js
+│   │   └── Editor.css
+│   ├── PdfPreview/
+│   │   ├── PdfPreview.js
+│   │   └── PdfPreview.css
+│   ├── Controls/
+│   │   ├── Controls.js
+│   │   └── Controls.css
+│   └── Layout/
+│       ├── Layout.js
+│       └── Layout.css
+├── utils/
+│   ├── transliterate.js
+│   ├── fonts.js
+│   ├── abcParser.js
+│   ├── pdfGenerator.js
+│   └── chordProcessor.js
+├── App.js
+├── App.css
+└── index.js

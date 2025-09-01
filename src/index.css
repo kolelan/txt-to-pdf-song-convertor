@@ -1,0 +1,18 @@
+.debug-info {
+  background-color: #e3f2fd;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.debug-info h4 {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+}
+
+.warning-message {
+  color: #f57c00;
+  font-size: 12px;
+  margin-top: 10px;
+}
