@@ -1,70 +1,185 @@
-# Getting Started with Create React App
+# Music Chord Converter 🎵
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Приложение для преобразования текста песен с аккордами в аккуратные PDF-документы. Специально разработано для музыкантов!
 
-## Available Scripts
+## ✨ Возможности
 
-In the project directory, you can run:
+- **📝 Текстовый редактор** с поддержкой ABC нотации
+- **👁️ Мгновенный предпросмотр** PDF в реальном времени
+- **🎸 Поддержка различных инструментов**: гитара, бас-гитара, банджо, мандолина, укулеле
+- **🎛️ Гибкие настройки** форматирования
+- **📊 Автоматическое выравнивание** аккордов и текста
+- **💾 Скачивание готовых PDF**-файлов
 
-### `npm start`
+## 🚀 Быстрый старт
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Установка
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+# Клонирование репозитория
+git clone git@github.com:kolelan/txt-to-pdf-song-convertor.git
+cd txt-to-pdf-song-convertor
 
-### `npm test`
+# Установка зависимостей
+npm install
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+# Запуск приложения
+npm start
+```
 
-### `npm run build`
+Приложение будет доступно по адресу: `http://localhost:3000`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Использование
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Введите текст** в левой части в формате ABC нотации
+2. **Настройте параметры** генерации в нижней панели
+3. **Нажмите "Предпросмотр PDF"** для генерации
+4. **Скачайте готовый файл** через предпросмотр
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📋 Формат ввода
 
-### `npm run eject`
+### Пример ABC нотации:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```abc
+X: 1
+T: Название песни
+M: 4/4
+L: 1/4
+Q:120
+R: Автор песни
+K: C
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+% Вступление
+||: C | G | Am | F :||
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+% Куплет 1
+| C | G |             % Текст первой строки
+| Am | F |            % Текст второй строки
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+% Припев
+| F | C |             % Текст припева
+| G | C |             % Продолжение припева
+```
 
-## Learn More
+### Поддерживаемые метаданные:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- `T:` - Название песни
+- `M:` - Размер такта (4/4, 3/4 и т.д.)
+- `Q:` - Темп (BPM)
+- `K:` - Тональность
+- `R:` - Автор(ы)
+- `%` - Комментарии/секции
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## ⚙️ Настройки
 
-### Code Splitting
+### Отображение
+- ✅ Текст песни - показывать текст под аккордами
+- ✅ Аккорды - отображать аккордовую сетку
+- ✅ Темп/Тональность - показывать метаданные
+- ✅ Заголовок - отображать название песни
+- ✅ Легенда - показывать информацию о инструменте и каподастре
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Форматирование
+- **Размер шрифта**: от 8px до 20px
+- **Межстрочный интервал**: от 1.0 до 2.4
 
-### Analyzing the Bundle Size
+### Инструмент
+- **Выбор инструмента**: гитара, бас-гитара, банджо, мандолина, укулеле
+- **Каподастр**: установка от 0 до 7 лада
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 🎯 Особенности
 
-### Making a Progressive Web App
+### Для музыкантов
+- **Аккордовая сетка** с правильным выравниванием
+- **Поддержка каподастра** для транспозиции
+- **Читаемые PDF** с моноширинным шрифтом
+- **Компактное расположение** на одной странице
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Технические особенности
+- **React-приложение** с модульной архитектурой
+- **Реальный предпросмотр** без перезагрузки
+- **Адаптивный дизайн** для всех устройств
+- **Поддержка кириллицы** через транслитерацию
 
-### Advanced Configuration
+## 📁 Структура проекта
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```
+src/
+├── components/          # React-компоненты
+│   ├── Editor/         # Текстовый редактор
+│   ├── PdfPreview/     # Предпросмотр PDF
+│   ├── Controls/       # Панель управления
+│   └── Layout/         # Основной layout
+├── utils/              # Вспомогательные функции
+│   ├── abcParser.js    # Парсер ABC нотации
+│   ├── pdfGenerator.js # Генератор PDF
+│   └── transliterate.js# Транслитерация кириллицы
+└── App.js              # Основной компонент
+```
 
-### Deployment
+## 🛠️ Технологии
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- **React 18** - Frontend framework
+- **jsPDF** - Генерация PDF документов
+- **CSS3** - Стилизация и анимации
+- **HTML5** - Разметка и структура
 
-### `npm run build` fails to minify
+## 📦 Установка зависимостей
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+# Основные зависимости
+npm install jspdf
+
+# Для разработки
+npm install --save-dev @testing-library/react @testing-library/jest-dom
+```
+
+## 🎨 Кастомизация
+
+### Добавление нового инструмента
+
+1. Добавьте option в `Controls.js`:
+```jsx
+<option value="new-instrument">Новый инструмент</option>
+```
+
+2. Обновите обработку в `pdfGenerator.js`:
+```javascript
+case 'new-instrument':
+  return processForNewInstrument(chord);
+```
+
+### Изменение стилей PDF
+
+Редактируйте файл `pdfGenerator.js` для настройки:
+- Размеров шрифтов
+- Отступов и полей
+- Цветовой схемы
+- Расположения элементов
+
+## 🤝 Contributing
+
+Мы приветствуем contributions! Для внесения изменений:
+
+1. Форкните репозиторий
+2. Создайте feature branch: `git checkout -b feature/amazing-feature`
+3. Закомитьте изменения: `git commit -m 'Add amazing feature'`
+4. Запушьте branch: `git push origin feature/amazing-feature`
+5. Откройте Pull Request
+
+## 📄 Лицензия
+
+Этот проект распространяется под MIT License - смотрите файл [LICENSE](LICENSE) для деталей.
+
+## 🆘 Поддержка
+
+Если у вас возникли вопросы или проблемы:
+
+1. Проверьте формат ввода данных
+2. Убедитесь, что все зависимости установлены
+3. Проверьте консоль браузера на наличие ошибок
+4. Создайте issue в репозитории
+
+---
+
+**Happy coding! 🎸**
