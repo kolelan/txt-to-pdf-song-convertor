@@ -5,27 +5,28 @@ import PdfPreview from './components/PdfPreview/PdfPreview';
 import Controls from './components/Controls/Controls';
 import { parseAbcNotation } from './utils/abcParser';
 import { generatePdf } from './utils/pdfGenerator';
+import { generatePdfAligned } from './utils/pdfGeneratorAlined';
 import './App.css';
 
 function App() {
   const [inputText, setInputText] = useState(`X: 1
-T: Белым дымом
+T: White smoke
 M: 4/4
 L: 1/4
 Q:110
-R: Г. Степенко / Н. Ярков
+R: G. Stepenko / N. Yarkov
 K: Ab 
 % Intro
 ||: Ab |  Eb | Bb | Db :||
-% Куплет 1
-| Ab | Eb |             % Железной иглой проколют мне вену
-| Bb | Db |             % И раствориться в крови
-| Ab | Eb |             % Всё то лекарство что дала ты мне
-| Bb | Db |             % Что бы спасти мою жизнь
-% Припев
-| Ab | Cmb |          % Жги, жги белым дымом
-| Fm | Eb |             % Беги от меня скорее прочь
-% Соло
+% Verse 1
+| Ab | Eb | % An iron needle will pierce my vein
+| Bb | Db | % And dissolve in blood
+| Ab | Eb | % All the medicine that you gave me
+| Bb | Db | % To save my life
+% Chorus
+| Ab | Cmb | % Burn, burn white smoke
+| Fm | Eb | % Run away from me quickly
+% Solo
 | Ab |  Eb | Bb | Db |`);
 
   const [parsedData, setParsedData] = useState(null);
@@ -38,6 +39,8 @@ K: Ab
     showTempo: true,
     showTitle: true,
     showLegend: true,
+    fontSize: 9,
+    lineHeight: 1.4,
     instrument: 'guitar',
     capo: 0
   });
@@ -75,6 +78,7 @@ K: Ab
     try {
       console.log('Generating PDF with:', parsedData);
       const pdfBlob = await generatePdf(parsedData, options);
+      // const pdfBlob = await generatePdfAligned(parsedData, options);
       const url = URL.createObjectURL(pdfBlob);
       setPdfUrl(url);
     } catch (err) {
