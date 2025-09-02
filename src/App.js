@@ -16,18 +16,18 @@ L: 1/4
 Q:110
 R: G. Stepenko / N. Yarkov
 K: Ab 
-% Intro
+ % Intro
 ||: Ab |  Eb | Bb | Db :||
 % Verse 1
 | Ab | Eb | % An iron needle will pierce my vein
 | Bb | Db | % And dissolve in blood
 | Ab | Eb | % All the medicine that you gave me
-| Bb | Db | % To save my life
+| Bb | Db | % Into the silence a whisper shud
 % Chorus
 | Ab | Cmb | % Burn, burn white smoke
-| Fm | Eb | % Run away from me quickly
+| Fm | Eb | % Run away my spirit broke
 % Solo
-| Ab |  Eb | Bb | Db |`);
+| Ab | Eb | Bb | Db |`);
 
   const [parsedData, setParsedData] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
