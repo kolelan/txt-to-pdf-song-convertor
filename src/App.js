@@ -7,6 +7,7 @@ import { parseAbcNotation } from './utils/abcParser';
 import { generatePdf } from './utils/pdfGenerator';
 import { generatePdfAligned } from './utils/pdfGeneratorAlined';
 import './App.css';
+import Footer from "./components/Footer/Footer";
 
 function App() {
   const [inputText, setInputText] = useState(`X: 1
@@ -39,8 +40,8 @@ K: Ab
     showTempo: true,
     showTitle: true,
     showLegend: true,
-    fontSize: 9,
-    lineHeight: 1.4,
+    fontSize: 12,
+    lineHeight: 0.4,
     instrument: 'guitar',
     capo: 0
   });
@@ -124,6 +125,9 @@ K: Ab
                   loading={loading}
                   hasData={!!parsedData}
               />
+            }
+            footer={
+              <Footer />
             }
         />
       </div>
