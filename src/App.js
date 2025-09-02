@@ -104,7 +104,13 @@ K: Ab
                 {parsedData && (
                     <div className="debug-info">
                       <p>Секций: {parsedData.sections.length}</p>
-                      <p>Тактов: {parsedData.sections.reduce((acc, s) => acc + s.measures.length, 0)}</p>
+                      <p>Тактов: {parsedData.totalBars}</p>
+                      <p>Линий с тактами: {parsedData.sections.reduce((acc, s) => acc + s.measures.length, 0)}</p>
+                      {parsedData.sections.map((section, index) => (
+                          <p key={index} style={{fontSize: '12px', margin: '2px 0'}}>
+                            {section.name}: {section.bars} тактов
+                          </p>
+                      ))}
                     </div>
                 )}
               </>
