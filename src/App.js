@@ -42,10 +42,12 @@ K: Ab
     showLegend: true,
     fontSize: 12,
     lineHeight: 0.4,
+    fixedTextOffset: 80,
+    fontFamily: 'Roboto Mono',
+    fontStyle: 'normal',
     instrument: 'guitar',
     capo: 0
   });
-
   useEffect(() => {
     try {
       const parsed = parseAbcNotation(inputText);

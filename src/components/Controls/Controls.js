@@ -11,10 +11,20 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
 
     const fontSizeOptions = [8, 9, 10, 11, 12, 14, 16, 18, 20];
     const lineHeightOptions = [0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8];
+    const offsetOptions = [50, 60, 70, 80, 90, 100];
+    const fontFamilyOptions = ['Roboto Mono', 'PT Mono', 'Courier', 'Helvetica'];
+    const fontStyleOptions = [
+        { value: 'normal', label: 'Normal' },
+        { value: 'bold', label: 'Bold' },
+        { value: 'italic', label: 'Italic' },
+        { value: 'bolditalic', label: 'Bold Italic' },
+        { value: 'light', label: 'Light' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'semibold', label: 'Semi Bold' }
+    ];
 
     return (
         <div className="controls">
-            {/* Кнопка предпросмотра вместо заголовка */}
             <div className="preview-header">
                 <button
                     onClick={onGeneratePdf}
@@ -88,6 +98,21 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                         <h4>Форматирование</h4>
                         <div className="control-item">
                             <label>
+                                <span>Смещение текста:</span>
+                                <select
+                                    value={options.fixedTextOffset || 80}
+                                    onChange={(e) => handleOptionChange('fixedTextOffset', parseInt(e.target.value))}
+                                >
+                                    {offsetOptions.map(offset => (
+                                        <option key={offset} value={offset}>
+                                            {offset}px
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                        <div className="control-item">
+                            <label>
                                 <span>Размер шрифта:</span>
                                 <select
                                     value={options.fontSize}
@@ -119,8 +144,42 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                     </div>
                 </div>
 
-                {/* Колонка 3: Инструмент */}
+                {/* Колонка 3: Шрифты и инструмент */}
                 <div className="control-column">
+                    <div className="settings-group">
+                        <h4>Шрифт</h4>
+                        <div className="control-item">
+                            <label>
+                                <span>Шрифт:</span>
+                                <select
+                                    value={options.fontFamily || 'Roboto Mono'}
+                                    onChange={(e) => handleOptionChange('fontFamily', e.target.value)}
+                                >
+                                    {fontFamilyOptions.map(font => (
+                                        <option key={font} value={font}>
+                                            {font}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                        <div className="control-item">
+                            <label>
+                                <span>Стиль шрифта:</span>
+                                <select
+                                    value={options.fontStyle || 'normal'}
+                                    onChange={(e) => handleOptionChange('fontStyle', e.target.value)}
+                                >
+                                    {fontStyleOptions.map(style => (
+                                        <option key={style.value} value={style.value}>
+                                            {style.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="settings-group">
                         <h4>Инструмент</h4>
                         <div className="control-item">
