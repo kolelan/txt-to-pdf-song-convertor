@@ -5,7 +5,7 @@ import PdfPreview from './components/PdfPreview/PdfPreview';
 import Controls from './components/Controls/Controls';
 import { parseAbcNotation } from './utils/abcParser';
 import { generatePdf } from './utils/pdfGenerator';
-import { generatePdfAligned } from './utils/pdfGeneratorAlined';
+import { analyzeBarsFromText, getBarStatistics } from './utils/barCounter'; // Импортируем функции подсчёта
 import './App.css';
 import Footer from "./components/Footer/Footer";
 
@@ -31,6 +31,7 @@ K: Ab
 | Ab | Eb | Bb | Db |`);
 
   const [parsedData, setParsedData] = useState(null);
+  const [barStatistics, setBarStatistics] = useState(null); // Добавляем состояние для статистики
   const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -48,25 +49,52 @@ K: Ab
     instrument: 'guitar',
     capo: 0
   });
+
   useEffect(() => {
     try {
       const parsed = parseAbcNotation(inputText);
       setParsedData(parsed);
+      // Подсчитываем такты после парсинга
+      const stats = getBarStatistics(parsed);
+      setBarStatistics(stats);
     } catch (err) {
       console.error('Initial parsing error:', err);
+      setBarStatistics(null);
     }
   }, []);
 
   const handleTextChange = (text) => {
-    setInputText(text);
-    try {
-      const parsed = parseAbcNotation(text);
-      setParsedData(parsed);
-      setError(null);
-    } catch (err) {
-      setError('Ошибка формата текста');
-      console.error('Parse error:', err);
-    }
+      setInputText(text);
+      try {
+          const parsed = parseAbcNotation(text);
+          setParsedData(parsed);
+
+          // Используем analyzeBarsFromText для точного подсчёта
+          const barAnalysis = analyzeBarsFromText(text);
+          console.log('Bar analysis:', barAnalysis);
+
+          // Обновляем статистику тактов
+          const stats = {
+              total: barAnalysis.totalBars,
+              sections: barAnalysis.sections.length,
+              averageBarsPerSection: barAnalysis.sections.length > 0
+                  ? Math.round(barAnalysis.totalBars / barAnalysis.sections.length)
+                  : 0,
+              hasRepeats: false, // Можно добавить проверку повторений
+              sectionDetails: barAnalysis.sections.map(section => ({
+                  name: section.name,
+                  bars: section.bars,
+                  hasRepeats: false
+              }))
+          };
+
+          setBarStatistics(stats);
+          setError(null);
+      } catch (err) {
+          setError('Ошибка формата текста');
+          console.error('Parse error:', err);
+          setBarStatistics(null);
+      }
   };
 
   const handleGeneratePdf = async () => {
@@ -81,7 +109,6 @@ K: Ab
     try {
       console.log('Generating PDF with:', parsedData);
       const pdfBlob = await generatePdf(parsedData, options);
-      // const pdfBlob = await generatePdfAligned(parsedData, options);
       const url = URL.createObjectURL(pdfBlob);
       setPdfUrl(url);
     } catch (err) {
@@ -103,16 +130,22 @@ K: Ab
               <>
                 <Editor value={inputText} onChange={handleTextChange} />
                 {error && <div className="error-message">{error}</div>}
-                {parsedData && (
-                    <div className="debug-info">
-                      <p>Секций: {parsedData.sections.length}</p>
-                      <p>Тактов: {parsedData.totalBars}</p>
-                      <p>Линий с тактами: {parsedData.sections.reduce((acc, s) => acc + s.measures.length, 0)}</p>
-                      {parsedData.sections.map((section, index) => (
-                          <p key={index} style={{fontSize: '12px', margin: '2px 0'}}>
-                            {section.name}: {section.bars} тактов
-                          </p>
-                      ))}
+                {barStatistics && (
+                    <div className="bar-statistics">
+                      <h4>Статистика тактов:</h4>
+                      <p>Всего тактов: <strong>{barStatistics.total}</strong></p>
+                      <p>Секций: <strong>{barStatistics.sections}</strong></p>
+
+                      <div className="section-details">
+                        <h5>Детали секций:</h5>
+                        {barStatistics.sectionDetails.map((section, index) => (
+                            <div key={index} className="section-item">
+                              <span className="section-name">{section.name}:</span>
+                              <span className="section-bars">{section.bars} тактов</span>
+                              {section.hasRepeats && <span className="repeat-indicator">🔄</span>}
+                            </div>
+                        ))}
+                      </div>
                     </div>
                 )}
               </>

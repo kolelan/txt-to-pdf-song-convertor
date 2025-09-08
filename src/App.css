@@ -1,40 +1,56 @@
-.error-message {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 10px;
-  border-radius: 4px;
-  margin-top: 10px;
-  border: 1px solid #ef5350;
+/* App.css */
+.bar-statistics {
+    margin-top: 15px;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #007bff;
 }
 
-.download-btn {
-  display: inline-block;
-  background: #27ae60;
-  color: white;
-  padding: 8px 16px;
-  text-decoration: none;
-  border-radius: 4px;
-  margin-top: 10px;
+.bar-statistics h4 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-size: 14px;
 }
 
-.download-btn:hover {
-  background: #219653;
-}
-.debug-info {
-  background-color: #e8f5e8;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 10px;
-  border-left: 4px solid #4caf50;
+.bar-statistics h5 {
+    margin: 15px 0 8px 0;
+    color: #6c757d;
+    font-size: 13px;
 }
 
-.debug-info p {
-  margin: 5px 0;
-  font-size: 13px;
-  color: #2e7d32;
+.bar-statistics p {
+    margin: 5px 0;
+    font-size: 13px;
+    color: #495057;
 }
 
-.debug-info p:first-child {
-  font-weight: bold;
-  color: #1b5e20;
+.section-details {
+    margin-top: 10px;
+}
+
+.section-item {
+    display: flex;
+    align-items: center;
+    margin: 4px 0;
+    padding: 3px 6px;
+    background-color: #e9ecef;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.section-name {
+    font-weight: 500;
+    margin-right: 8px;
+    flex: 1;
+}
+
+.section-bars {
+    color: #6c757d;
+    margin-right: 8px;
+}
+
+.repeat-indicator {
+    color: #dc3545;
+    font-size: 14px;
 }
