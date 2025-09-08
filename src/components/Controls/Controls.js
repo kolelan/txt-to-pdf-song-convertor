@@ -88,6 +88,14 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                 />
                                 <span>Легенда</span>
                             </label>
+                            <label className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    checked={options.showStatistics}
+                                    onChange={(e) => handleOptionChange('showStatistics', e.target.checked)}
+                                />
+                                <span>Статистика</span>
+                            </label>
                         </div>
                     </div>
                 </div>

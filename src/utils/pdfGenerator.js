@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import { registerCyrillicFont, safeText } from './cyrillicFonts';
+import { getBarStatistics } from './barCounter';
 
 export const generatePdf = async (parsedData, options) => {
   try {
@@ -101,6 +102,41 @@ export const generatePdf = async (parsedData, options) => {
       legend.forEach((line, index) => {
         if (yPosition + (index * legendSize * options.lineHeight) < 285) {
           safeText(doc, line, margin, yPosition + (index * legendSize * options.lineHeight));
+        }
+      });
+
+      yPosition += legend.length * legendSize * options.lineHeight + 5;
+    }
+
+    // Статистика (после легенды)
+    if (options.showStatistics && yPosition < 270) {
+      const statsSize = options.fontSize - 2;
+      doc.setFontSize(statsSize);
+      doc.setFont(options.fontFamily, 'normal');
+      doc.setTextColor(80, 80, 80);
+
+      // Получаем статистику тактов
+      const stats = getBarStatistics(parsedData);
+
+      // Заголовок статистики
+      safeText(doc, 'Статистика тактов:', margin, yPosition);
+      yPosition += statsSize * options.lineHeight;
+
+      // Общая информация
+      safeText(doc, `Всего тактов: ${stats.total}`, margin + 5, yPosition);
+      yPosition += statsSize * options.lineHeight;
+
+      safeText(doc, `Секций: ${stats.sections}`, margin + 5, yPosition);
+      yPosition += statsSize * options.lineHeight;
+
+      // Детали секций
+      safeText(doc, 'Детали секций:', margin, yPosition);
+      yPosition += statsSize * options.lineHeight;
+
+      stats.sectionDetails.forEach(section => {
+        if (yPosition < 270) {
+          safeText(doc, `${section.name}: ${section.bars} тактов`, margin + 10, yPosition);
+          yPosition += statsSize * options.lineHeight;
         }
       });
     }

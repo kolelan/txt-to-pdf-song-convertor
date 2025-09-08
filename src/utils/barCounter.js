@@ -207,6 +207,58 @@ export const getBarStatistics = (parsedData) => {
         }))
     };
 };
+// Добавляем эту функцию в barCounter.js
+
+/**
+ * Генерирует статистику по тактам из parsedData
+ * @param {Object} parsedData - Распарсенные данные
+ * @returns {Object} - Статистика
+ */
+export const getBarStatisticsFromParsedData = (parsedData) => {
+    if (!parsedData || !parsedData.sections) {
+        return {
+            total: 0,
+            sections: 0,
+            sectionDetails: []
+        };
+    }
+
+    let totalBars = 0;
+    const sectionDetails = [];
+
+    parsedData.sections.forEach(section => {
+        let sectionBars = 0;
+
+        if (section.measures && section.measures.length > 0) {
+            section.measures.forEach(measure => {
+                if (measure.originalLine) {
+                    sectionBars += countBarsInLine(measure.originalLine);
+                } else if (measure.chordPart) {
+                    const bars = measure.chordPart.split('|').filter(bar => {
+                        const trimmedBar = bar.trim();
+                        return trimmedBar.length > 0 && trimmedBar !== ':';
+                    }).length;
+                    sectionBars += bars;
+                } else {
+                    sectionBars += 1;
+                }
+            });
+            totalBars += sectionBars;
+        }
+
+        sectionDetails.push({
+            name: section.name || 'Unnamed Section',
+            bars: sectionBars
+        });
+    });
+
+    return {
+        total: totalBars,
+        sections: parsedData.sections.length,
+        sectionDetails: sectionDetails
+    };
+};
+
 
 export default {
     countBars,
@@ -214,5 +266,6 @@ export default {
     countBarsInSection,
     hasRepeatedBars,
     analyzeBarsFromText,
-    getBarStatistics
+    getBarStatistics,
+    getBarStatisticsFromParsedData
 };

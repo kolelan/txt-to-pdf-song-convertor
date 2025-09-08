@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import Layout from './components/Layout/Layout';
 import Editor from './components/Editor/Editor';
 import PdfPreview from './components/PdfPreview/PdfPreview';
 import Controls from './components/Controls/Controls';
-import { parseAbcNotation } from './utils/abcParser';
-import { generatePdf } from './utils/pdfGenerator';
-import { analyzeBarsFromText, getBarStatistics } from './utils/barCounter'; // Импортируем функции подсчёта
+import {parseAbcNotation} from './utils/abcParser';
+import {generatePdf} from './utils/pdfGenerator';
+import {analyzeBarsFromText, getBarStatistics} from './utils/barCounter'; // Импортируем функции подсчёта
 import './App.css';
 import Footer from "./components/Footer/Footer";
 
 function App() {
-  const [inputText, setInputText] = useState(`X: 1
+    const [inputText, setInputText] = useState(`X: 1
 T: White smoke
 M: 4/4
 L: 1/4
@@ -30,149 +30,149 @@ K: Ab
 % Solo
 | Ab | Eb | Bb | Db |`);
 
-  const [parsedData, setParsedData] = useState(null);
-  const [barStatistics, setBarStatistics] = useState(null); // Добавляем состояние для статистики
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [options, setOptions] = useState({
-    showLyrics: true,
-    showChords: true,
-    showTempo: true,
-    showTitle: true,
-    showLegend: true,
-    fontSize: 12,
-    lineHeight: 0.4,
-    fixedTextOffset: 80,
-    fontFamily: 'Roboto Mono',
-    fontStyle: 'normal',
-    instrument: 'guitar',
-    capo: 0
-  });
+    const [parsedData, setParsedData] = useState(null);
+    const [barStatistics, setBarStatistics] = useState(null); // Добавляем состояние для статистики
+    const [pdfUrl, setPdfUrl] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [options, setOptions] = useState({
+        showLyrics: true,
+        showChords: true,
+        showTempo: true,
+        showTitle: true,
+        showLegend: true,
+        showStatistics: true,
+        fontSize: 12,
+        lineHeight: 0.4,
+        fixedTextOffset: 80,
+        fontFamily: 'Roboto Mono',
+        fontStyle: 'normal',
+        instrument: 'guitar',
+        capo: 0
+    });
+    useEffect(() => {
+        try {
+            const parsed = parseAbcNotation(inputText);
+            setParsedData(parsed);
+            // Подсчитываем такты после парсинга
+            const stats = getBarStatistics(parsed);
+            setBarStatistics(stats);
+        } catch (err) {
+            console.error('Initial parsing error:', err);
+            setBarStatistics(null);
+        }
+    }, []);
 
-  useEffect(() => {
-    try {
-      const parsed = parseAbcNotation(inputText);
-      setParsedData(parsed);
-      // Подсчитываем такты после парсинга
-      const stats = getBarStatistics(parsed);
-      setBarStatistics(stats);
-    } catch (err) {
-      console.error('Initial parsing error:', err);
-      setBarStatistics(null);
-    }
-  }, []);
+    const handleTextChange = (text) => {
+        setInputText(text);
+        try {
+            const parsed = parseAbcNotation(text);
+            setParsedData(parsed);
 
-  const handleTextChange = (text) => {
-      setInputText(text);
-      try {
-          const parsed = parseAbcNotation(text);
-          setParsedData(parsed);
+            // Используем analyzeBarsFromText для точного подсчёта
+            const barAnalysis = analyzeBarsFromText(text);
+            console.log('Bar analysis:', barAnalysis);
 
-          // Используем analyzeBarsFromText для точного подсчёта
-          const barAnalysis = analyzeBarsFromText(text);
-          console.log('Bar analysis:', barAnalysis);
+            // Обновляем статистику тактов
+            const stats = {
+                total: barAnalysis.totalBars,
+                sections: barAnalysis.sections.length,
+                averageBarsPerSection: barAnalysis.sections.length > 0
+                    ? Math.round(barAnalysis.totalBars / barAnalysis.sections.length)
+                    : 0,
+                hasRepeats: false, // Можно добавить проверку повторений
+                sectionDetails: barAnalysis.sections.map(section => ({
+                    name: section.name,
+                    bars: section.bars,
+                    hasRepeats: false
+                }))
+            };
 
-          // Обновляем статистику тактов
-          const stats = {
-              total: barAnalysis.totalBars,
-              sections: barAnalysis.sections.length,
-              averageBarsPerSection: barAnalysis.sections.length > 0
-                  ? Math.round(barAnalysis.totalBars / barAnalysis.sections.length)
-                  : 0,
-              hasRepeats: false, // Можно добавить проверку повторений
-              sectionDetails: barAnalysis.sections.map(section => ({
-                  name: section.name,
-                  bars: section.bars,
-                  hasRepeats: false
-              }))
-          };
+            setBarStatistics(stats);
+            setError(null);
+        } catch (err) {
+            setError('Ошибка формата текста');
+            console.error('Parse error:', err);
+            setBarStatistics(null);
+        }
+    };
 
-          setBarStatistics(stats);
-          setError(null);
-      } catch (err) {
-          setError('Ошибка формата текста');
-          console.error('Parse error:', err);
-          setBarStatistics(null);
-      }
-  };
+    const handleGeneratePdf = async () => {
+        if (!parsedData) {
+            setError('Нет данных для генерации');
+            return;
+        }
 
-  const handleGeneratePdf = async () => {
-    if (!parsedData) {
-      setError('Нет данных для генерации');
-      return;
-    }
+        setLoading(true);
+        setError(null);
 
-    setLoading(true);
-    setError(null);
+        try {
+            console.log('Generating PDF with:', parsedData);
+            const pdfBlob = await generatePdf(parsedData, options);
+            const url = URL.createObjectURL(pdfBlob);
+            setPdfUrl(url);
+        } catch (err) {
+            console.error('Generation error:', err);
+            setError('Ошибка при создании PDF');
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    try {
-      console.log('Generating PDF with:', parsedData);
-      const pdfBlob = await generatePdf(parsedData, options);
-      const url = URL.createObjectURL(pdfBlob);
-      setPdfUrl(url);
-    } catch (err) {
-      console.error('Generation error:', err);
-      setError('Ошибка при создании PDF');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleOptionsChange = (newOptions) => {
+        setOptions(newOptions);
+    };
 
-  const handleOptionsChange = (newOptions) => {
-    setOptions(newOptions);
-  };
+    return (
+        <div className="App">
+            <Layout
+                leftPanel={
+                    <>
+                        <Editor value={inputText} onChange={handleTextChange}/>
+                        {error && <div className="error-message">{error}</div>}
+                        {barStatistics && (
+                            <div className="bar-statistics">
+                                <h4>Статистика тактов:</h4>
+                                <p>Всего тактов: <strong>{barStatistics.total}</strong></p>
+                                <p>Секций: <strong>{barStatistics.sections}</strong></p>
 
-  return (
-      <div className="App">
-        <Layout
-            leftPanel={
-              <>
-                <Editor value={inputText} onChange={handleTextChange} />
-                {error && <div className="error-message">{error}</div>}
-                {barStatistics && (
-                    <div className="bar-statistics">
-                      <h4>Статистика тактов:</h4>
-                      <p>Всего тактов: <strong>{barStatistics.total}</strong></p>
-                      <p>Секций: <strong>{barStatistics.sections}</strong></p>
-
-                      <div className="section-details">
-                        <h5>Детали секций:</h5>
-                        {barStatistics.sectionDetails.map((section, index) => (
-                            <div key={index} className="section-item">
-                              <span className="section-name">{section.name}:</span>
-                              <span className="section-bars">{section.bars} тактов</span>
-                              {section.hasRepeats && <span className="repeat-indicator">🔄</span>}
+                                <div className="section-details">
+                                    <h5>Детали секций:</h5>
+                                    {barStatistics.sectionDetails.map((section, index) => (
+                                        <div key={index} className="section-item">
+                                            <span className="section-name">{section.name}:</span>
+                                            <span className="section-bars">{section.bars} тактов</span>
+                                            {section.hasRepeats && <span className="repeat-indicator">🔄</span>}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        ))}
-                      </div>
-                    </div>
-                )}
-              </>
-            }
-            rightPanel={
-              <PdfPreview
-                  pdfUrl={pdfUrl}
-                  parsedData={parsedData}
-                  options={options}
-                  loading={loading}
-              />
-            }
-            controls={
-              <Controls
-                  options={options}
-                  onOptionsChange={handleOptionsChange}
-                  onGeneratePdf={handleGeneratePdf}
-                  loading={loading}
-                  hasData={!!parsedData}
-              />
-            }
-            footer={
-              <Footer />
-            }
-        />
-      </div>
-  );
+                        )}
+                    </>
+                }
+                rightPanel={
+                    <PdfPreview
+                        pdfUrl={pdfUrl}
+                        parsedData={parsedData}
+                        options={options}
+                        loading={loading}
+                    />
+                }
+                controls={
+                    <Controls
+                        options={options}
+                        onOptionsChange={handleOptionsChange}
+                        onGeneratePdf={handleGeneratePdf}
+                        loading={loading}
+                        hasData={!!parsedData}
+                    />
+                }
+                footer={
+                    <Footer/>
+                }
+            />
+        </div>
+    );
 }
 
 export default App;
