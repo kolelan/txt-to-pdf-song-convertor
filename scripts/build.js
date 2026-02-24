@@ -82,10 +82,27 @@ process.env.INLINE_RUNTIME_CHUNK = 'false';
 // Запускаем сборку
 console.log('🚀 Запуск сборки...\n');
 try {
-  execSync('react-scripts build', { 
+  execSync('npx react-scripts build', { 
     stdio: 'inherit',
-    env: { ...process.env }
+    env: { ...process.env },
+    cwd: path.join(__dirname, '..')
   });
+  
+  // Если нужны относительные пути, заменяем абсолютные пути в index.html
+  if (useRelativePaths && baseUrl) {
+    const indexPath = path.join(__dirname, '..', 'build', 'index.html');
+    if (fs.existsSync(indexPath)) {
+      let indexContent = fs.readFileSync(indexPath, 'utf8');
+      // Заменяем абсолютные пути /ttp_v4/ на относительные ttp_v4/
+      const absolutePath = baseUrl.startsWith('/') ? baseUrl : '/' + baseUrl;
+      const relativePath = baseUrl.replace(/^\/+/, '').replace(/\/+$/, ''); // Убираем слэши в начале и конце
+      // Заменяем /ttp_v4/ на ttp_v4/ (убираем начальный слэш)
+      const regex = new RegExp(absolutePath.replace(/\//g, '\\/') + '/', 'g');
+      indexContent = indexContent.replace(regex, relativePath + '/');
+      fs.writeFileSync(indexPath, indexContent, 'utf8');
+      console.log('   ✏️  Пути в index.html заменены на относительные');
+    }
+  }
   
   console.log('\n✅ Сборка завершена успешно!');
   console.log(`📦 Файлы находятся в папке: build/`);

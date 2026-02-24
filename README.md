@@ -40,34 +40,57 @@ npm start
 ```bash
 npm run build
 ```
+Собранные файлы будут в папке `build/` и готовы для развертывания в корне домена.
 
 #### Сборка с базовым URL и относительными путями
 ```bash
-# Для папки ttp_v3 с относительными путями
-npm run build:ttp_v3
+# Для папки ttp_v4 с относительными путями (рекомендуется)
+node scripts/build.js --base-url=ttp_v4 --relative-paths
 
-# Или с произвольным базовым URL
-npm run build:custom -- --base-url=ttp_v3 --relative-paths
+# Или для других версий
+node scripts/build.js --base-url=ttp_v3 --relative-paths
 ```
+
+**Преимущества относительных путей:**
+- Работают при развертывании в любой подпапке
+- Не требуют настройки веб-сервера для базового URL
+- Удобны для локального тестирования
 
 #### Сборка с базовым URL и абсолютными путями
 ```bash
-# Для папки ttp_v3 с абсолютными путями
-npm run build:ttp_v3:absolute
+# Для папки ttp_v4 с абсолютными путями
+node scripts/build.js --base-url=ttp_v4 --absolute-paths
 
-# Или с произвольным базовым URL
-npm run build:custom -- --base-url=ttp_v3 --absolute-paths
+# Или для других версий
+node scripts/build.js --base-url=ttp_v3 --absolute-paths
 ```
 
 **Параметры сборки:**
-- `--base-url=<url>` - Базовый URL (например, `ttp_v3`). По умолчанию: корень домена
-- `--relative-paths` - Использовать относительные пути к JS/CSS файлам (по умолчанию)
-- `--absolute-paths` - Использовать абсолютные пути к JS/CSS файлам
+- `--base-url=<url>` - Базовый URL (например, `ttp_v4`, `ttp_v3`). Без начального слэша
+- `--relative-paths` - Использовать относительные пути к JS/CSS файлам (рекомендуется)
+- `--absolute-paths` - Использовать абсолютные пути к JS/CSS файлам от корня домена
 
-**Примеры:**
-- `npm run build:custom -- --base-url=ttp_v3 --relative-paths` - сборка для `/ttp_v3/` с относительными путями
-- `npm run build:custom -- --base-url=ttp_v3 --absolute-paths` - сборка для `/ttp_v3/` с абсолютными путями от корня
-- `npm run build:custom -- --base-url=myapp --relative-paths` - сборка для `/myapp/` с относительными путями
+**Примеры использования:**
+```bash
+# Сборка для ttp_v4 с относительными путями
+node scripts/build.js --base-url=ttp_v4 --relative-paths
+
+# Сборка для ttp_v3 с относительными путями
+node scripts/build.js --base-url=ttp_v3 --relative-paths
+
+# Сборка для произвольной папки с относительными путями
+node scripts/build.js --base-url=myapp --relative-paths
+
+# Сборка с абсолютными путями
+node scripts/build.js --base-url=ttp_v4 --absolute-paths
+```
+
+**После сборки:**
+1. Файлы будут находиться в папке `build/`
+2. Для развертывания поместите **содержимое** папки `build/` в папку с именем базового URL на сервере
+3. Например, для `--base-url=ttp_v4` поместите файлы в `http://yourdomain.com/ttp_v4/`
+
+**Примечание:** Скрипт автоматически заменяет абсолютные пути на относительные в `index.html` при использовании флага `--relative-paths`.
 
 ### Использование
 
