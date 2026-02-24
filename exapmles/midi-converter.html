@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ABC to MIDI Converter - С пользовательскими аккордами</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .left-panel, .right-panel {
+            flex: 1;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #0b7dda;
+        }
+        button.play {
+            background: #FF9800;
+        }
+        button.play:hover {
+            background: #F57C00;
+        }
+        button.stop {
+            background: #f44336;
+        }
+        button.stop:hover {
+            background: #d32f2f;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .player-controls {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+        .progress-container {
+            margin-top: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .info-file {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+        .info-file strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid #ffeeba;
+        }
+        #preview {
+            background: white;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        h3 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Конвертер ABC в MIDI с пользовательскими аккордами</h1>
+    <div class="info-file" id="fileProtocolInfo" style="display: none;">
+        <strong>ℹ️ Файл открыт локально</strong>
+        Этот файл можно открывать напрямую из файловой системы (двойной клик по файлу). 
+        Если функция "Скачать MIDI" не работает, откройте файл через локальный веб-сервер или используйте функцию "Воспроизвести" для прослушивания.
+    </div>
+    <div class="info">
+        <strong>Песня:</strong> Будь спокоен - A.Litvinenko / Nicotine Trip<br>
+        <strong>Темп:</strong> 73 BPM | <strong>Размер:</strong> 2/4 | <strong>Тональность:</strong> Gm
+    </div>
+
+    <div class="container">
+        <div class="left-panel">
+            <h3>ABC нотация:</h3>
+            <textarea id="abcInput">
+X: 1
+T: Будь спокоен
+M: 2/4
+L: 1/4
+Q:73
+R: A.Litvinenko / Nicotine Trip
+K: Gm 
+
+% Вступление
+| Gm | Bb | Eb | D  |
+| Gm | Bb | Eb | D  |
+| Gm | Bb | Eb | D  |
+| Gm | Bb | Eb | D  |
+
+% Тихая часть куплет 1
+| Gm | Bb | Eb | D  | % Почти спустился розовый закат
+| Gm | Bb | Eb | D  | % Ты приходил в сознанье много дней подряд
+| Gm | Bb | Eb | D  | % Очнувшись среди ночи сердце бьется сквозь туман
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+
+% Мощная часть куплет 1
+| Gm | Bb | Eb | D  | % Над банкой с папиросами чудит веселый смог
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Поменялось все местами стены, пол и потолок
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Здесь последние пять дней ты гонял своих чертей!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+
+% Припев
+| Eb | Eb | F  | F  | % Дело не в тебе, жизнь все расставит по местам.
+| Bb | Bb | G  | G  | % В этой гребаной беде виноват ты только сам.
+| Eb | Eb | F  | F  | % Будь бесстрашным, будь веселым, будь самим собой!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+
+% Куплет 2
+| Gm | Bb | Eb | D  | % Хитрый бес кругами ходит матерится невпопад!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Говорит, что жизнь твоя не ад, а лишь твоя дорога в ад!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Взглядом светлым обведи круг вокруг себя!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Бес повержен, в пол рогами уперся и кричит! 
+| Gm | Bb | Eb | D  | % Ты спокойствием его сразил, как будто это меч и щит!
+| Gm | Bb | Eb | D  | % Сдерни шторы! В окнах солнце увидит мозг больной!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+
+% Припев
+| Eb | Eb | F  | F  | % Дело не в тебе, жизнь все расставит по местам.
+| Bb | Bb | G  | G  | % В этой гребаной беде виноват ты только сам.
+| Eb | Eb | F  | F  | % Будь бесстрашным, будь веселым, будь самим собой!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb |           % Я спокоен...
+            </textarea>
+        </div>
+        
+        <div class="right-panel">
+            <h3>Пользовательские аккорды (один аккорд на строку):</h3>
+            <textarea id="chordOverrides" placeholder="Пример:
+Gm G3 Bb3 D3
+Gm7 G3 Bb3 D3 A3
+Asus2 A3 B3 E3
+Bdim4 B3 D3 F3 G3
+
+Формат: Название_аккорда нота1 нота2 нота3 ...">
+Gm G3 Bb3 D3
+G G3 B3 D3
+Bb Bb3 D3 F3
+Eb Eb3 G3 Bb3
+D D3 F#3 A3
+F F3 A3 C4
+            </textarea>
+        </div>
+    </div>
+
+    <div>
+        <button onclick="convertToMIDI()">Скачать MIDI</button>
+        <button class="secondary" onclick="previewABC()">Проверить аккорды</button>
+        <button class="secondary" onclick="resetToDefault()">Сбросить к умолчанию</button>
+        <button class="play" id="playBtn" onclick="togglePlayback()">▶ Воспроизвести</button>
+        <button class="stop" id="stopBtn" onclick="stopPlayback()" disabled>⏹ Остановить</button>
+    </div>
+    
+    <div class="player-controls" id="playerControls" style="display: none;">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-info">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+    </div>
+    
+    <div id="warning" class="warning" style="display: none;"></div>
+    <div id="preview"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/midi-writer-js@2.4.2/dist/midi-writer-js.min.js" 
+            onerror="loadFallbackLibrary()"></script>
+    <script>
+        // Загрузка библиотеки из альтернативного источника при ошибке
+        function loadFallbackLibrary() {
+            console.log('Попытка загрузки библиотеки из альтернативного источника...');
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/midi-writer-js@2.4.2/dist/midi-writer-js.min.js';
+            script.onerror = function() {
+                console.error('Не удалось загрузить библиотеку из альтернативного источника');
+            };
+            document.head.appendChild(script);
+        }
+        // Полная карта MIDI нот для всех октав фортепиано
+        const midiNotes = {
+            // Октава 0
+            'C0': 12, 'C#0': 13, 'Db0': 13, 'D0': 14, 'D#0': 15, 'Eb0': 15, 'E0': 16, 'F0': 17, 'F#0': 18, 'Gb0': 18, 'G0': 19, 'G#0': 20, 'Ab0': 20, 'A0': 21, 'A#0': 22, 'Bb0': 22, 'B0': 23,
+            // Октава 1
+            'C1': 24, 'C#1': 25, 'Db1': 25, 'D1': 26, 'D#1': 27, 'Eb1': 27, 'E1': 28, 'F1': 29, 'F#1': 30, 'Gb1': 30, 'G1': 31, 'G#1': 32, 'Ab1': 32, 'A1': 33, 'A#1': 34, 'Bb1': 34, 'B1': 35,
+            // Октава 2
+            'C2': 36, 'C#2': 37, 'Db2': 37, 'D2': 38, 'D#2': 39, 'Eb2': 39, 'E2': 40, 'F2': 41, 'F#2': 42, 'Gb2': 42, 'G2': 43, 'G#2': 44, 'Ab2': 44, 'A2': 45, 'A#2': 46, 'Bb2': 46, 'B2': 47,
+            // Октава 3
+            'C3': 48, 'C#3': 49, 'Db3': 49, 'D3': 50, 'D#3': 51, 'Eb3': 51, 'E3': 52, 'F3': 53, 'F#3': 54, 'Gb3': 54, 'G3': 55, 'G#3': 56, 'Ab3': 56, 'A3': 57, 'A#3': 58, 'Bb3': 58, 'B3': 59,
+            // Октава 4
+            'C4': 60, 'C#4': 61, 'Db4': 61, 'D4': 62, 'D#4': 63, 'Eb4': 63, 'E4': 64, 'F4': 65, 'F#4': 66, 'Gb4': 66, 'G4': 67, 'G#4': 68, 'Ab4': 68, 'A4': 69, 'A#4': 70, 'Bb4': 70, 'B4': 71,
+            // Октава 5
+            'C5': 72, 'C#5': 73, 'Db5': 73, 'D5': 74, 'D#5': 75, 'Eb5': 75, 'E5': 76, 'F5': 77, 'F#5': 78, 'Gb5': 78, 'G5': 79, 'G#5': 80, 'Ab5': 80, 'A5': 81, 'A#5': 82, 'Bb5': 82, 'B5': 83,
+            // Октава 6
+            'C6': 84, 'C#6': 85, 'Db6': 85, 'D6': 86, 'D#6': 87, 'Eb6': 87, 'E6': 88, 'F6': 89, 'F#6': 90, 'Gb6': 90, 'G6': 91, 'G#6': 92, 'Ab6': 92, 'A6': 93, 'A#6': 94, 'Bb6': 94, 'B6': 95,
+            // Октава 7
+            'C7': 96, 'C#7': 97, 'Db7': 97, 'D7': 98, 'D#7': 99, 'Eb7': 99, 'E7': 100, 'F7': 101, 'F#7': 102, 'Gb7': 102, 'G7': 103, 'G#7': 104, 'Ab7': 104, 'A7': 105, 'A#7': 106, 'Bb7': 106, 'B7': 107,
+            // Октава 8
+            'C8': 108, 'C#8': 109, 'Db8': 109, 'D8': 110, 'D#8': 111, 'Eb8': 111, 'E8': 112, 'F8': 113, 'F#8': 114, 'Gb8': 114, 'G8': 115, 'G#8': 116, 'Ab8': 116, 'A8': 117, 'A#8': 118, 'Bb8': 118, 'B8': 119
+        };
+
+        // Аккорды по умолчанию (все мажорные и минорные в 3-й октаве)
+        const defaultChordNotes = {
+            // Мажорные аккорды
+            'C':  { notes: ['C3', 'E3', 'G3'], name: 'До мажор' },
+            'C#': { notes: ['C#3', 'F3', 'G#3'], name: 'До-диез мажор' },
+            'Db': { notes: ['Db3', 'F3', 'Ab3'], name: 'Ре-бемоль мажор' },
+            'D':  { notes: ['D3', 'F#3', 'A3'], name: 'Ре мажор' },
+            'D#': { notes: ['D#3', 'G3', 'A#3'], name: 'Ре-диез мажор' },
+            'Eb': { notes: ['Eb3', 'G3', 'Bb3'], name: 'Ми-бемоль мажор' },
+            'E':  { notes: ['E3', 'G#3', 'B3'], name: 'Ми мажор' },
+            'F':  { notes: ['F3', 'A3', 'C4'], name: 'Фа мажор' },
+            'F#': { notes: ['F#3', 'A#3', 'C#4'], name: 'Фа-диез мажор' },
+            'Gb': { notes: ['Gb3', 'Bb3', 'Db4'], name: 'Соль-бемоль мажор' },
+            'G':  { notes: ['G3', 'B3', 'D4'], name: 'Соль мажор' },
+            'G#': { notes: ['G#3', 'C4', 'D#4'], name: 'Соль-диез мажор' },
+            'Ab': { notes: ['Ab3', 'C4', 'Eb4'], name: 'Ля-бемоль мажор' },
+            'A':  { notes: ['A3', 'C#4', 'E4'], name: 'Ля мажор' },
+            'A#': { notes: ['A#3', 'D4', 'F4'], name: 'Ля-диез мажор' },
+            'Bb': { notes: ['Bb3', 'D4', 'F4'], name: 'Си-бемоль мажор' },
+            'B':  { notes: ['B3', 'D#4', 'F#4'], name: 'Си мажор' },
+            
+            // Минорные аккорды
+            'Cm':  { notes: ['C3', 'Eb3', 'G3'], name: 'До минор' },
+            'C#m': { notes: ['C#3', 'E3', 'G#3'], name: 'До-диез минор' },
+            'Dbm': { notes: ['Db3', 'E3', 'Ab3'], name: 'Ре-бемоль минор' },
+            'Dm':  { notes: ['D3', 'F3', 'A3'], name: 'Ре минор' },
+            'D#m': { notes: ['D#3', 'F#3', 'A#3'], name: 'Ре-диез минор' },
+            'Ebm': { notes: ['Eb3', 'Gb3', 'Bb3'], name: 'Ми-бемоль минор' },
+            'Em':  { notes: ['E3', 'G3', 'B3'], name: 'Ми минор' },
+            'Fm':  { notes: ['F3', 'Ab3', 'C4'], name: 'Фа минор' },
+            'F#m': { notes: ['F#3', 'A3', 'C#4'], name: 'Фа-диез минор' },
+            'Gbm': { notes: ['Gb3', 'A3', 'Db4'], name: 'Соль-бемоль минор' },
+            'Gm':  { notes: ['G3', 'Bb3', 'D4'], name: 'Соль минор' },
+            'G#m': { notes: ['G#3', 'B3', 'D#4'], name: 'Соль-диез минор' },
+            'Abm': { notes: ['Ab3', 'B3', 'Eb4'], name: 'Ля-бемоль минор' },
+            'Am':  { notes: ['A3', 'C4', 'E4'], name: 'Ля минор' },
+            'A#m': { notes: ['A#3', 'C#4', 'F4'], name: 'Ля-диез минор' },
+            'Bbm': { notes: ['Bb3', 'Db4', 'F4'], name: 'Си-бемоль минор' },
+            'Bm':  { notes: ['B3', 'D4', 'F#4'], name: 'Си минор' }
+        };
+
+        let chordNotes = JSON.parse(JSON.stringify(defaultChordNotes)); // Копируем дефолтные аккорды
+        
+        // Переменные для воспроизведения
+        let audioContext = null;
+        let isPlaying = false;
+        let isPaused = false;
+        let playbackTimeout = null;
+        let currentChordIndex = 0;
+        let playbackChords = [];
+        let playbackChordDurations = []; // Длительности аккордов в долях четверти
+        let playbackBarDurations = []; // Полные длительности тактов в долях четверти
+        let playbackTempo = 120;
+        let startTime = 0;
+        let pausedTime = 0;
+        let pauseStartTime = 0;
+        let progressUpdateInterval = null;
+
+        function parseChordOverrides(text) {
+            const overrides = {};
+            const lines = text.split('\n');
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (line === '' || line.startsWith('#')) continue;
+                
+                const parts = line.split(/\s+/);
+                if (parts.length >= 2) {
+                    const chordName = parts[0];
+                    const notes = parts.slice(1);
+                    
+                    // Проверяем, что все ноты существуют в midiNotes
+                    const validNotes = notes.filter(note => midiNotes[note] !== undefined);
+                    
+                    if (validNotes.length === notes.length) {
+                        overrides[chordName] = {
+                            notes: notes,
+                            name: `Пользовательский: ${chordName}`
+                        };
+                    } else {
+                        const invalidNotes = notes.filter(note => midiNotes[note] === undefined);
+                        console.warn(`Предупреждение: В аккорде ${chordName} не найдены ноты: ${invalidNotes.join(', ')}`);
+                    }
+                }
+            }
+            
+            return overrides;
+        }
+
+        function mergeChords(overrides) {
+            // Начинаем с копии дефолтных аккордов
+            const merged = JSON.parse(JSON.stringify(defaultChordNotes));
+            
+            // Перезаписываем пользовательскими определениями
+            for (let [chord, value] of Object.entries(overrides)) {
+                merged[chord] = value;
+            }
+            
+            return merged;
+        }
+
+        function parseABC(text) {
+            const lines = text.split('\n');
+            const chords = [];
+            const chordDurations = []; // Длительности аккордов в долях четверти
+            const barDurations = []; // Полные длительности тактов в долях четверти
+            let tempo = 120;
+            let meter = '2/4';
+            let noteLength = '1/4'; // Базовая длительность ноты (L:)
+            const unknownChords = new Set();
+            
+            // Парсим размер такта и базовую длительность заранее
+            let meterNumerator = 2;
+            let meterDenominator = 4;
+            let noteLengthNumerator = 1;
+            let noteLengthDenominator = 4;
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (line === '') continue;
+                
+                if (line.startsWith('Q:')) {
+                    const match = line.match(/Q:(\d+)/);
+                    if (match) tempo = parseInt(match[1]);
+                }
+                else if (line.startsWith('M:')) {
+                    meter = line.substring(2).trim();
+                    const meterMatch = meter.match(/(\d+)\/(\d+)/);
+                    if (meterMatch) {
+                        meterNumerator = parseInt(meterMatch[1]);
+                        meterDenominator = parseInt(meterMatch[2]);
+                    }
+                }
+                else if (line.startsWith('L:')) {
+                    noteLength = line.substring(2).trim();
+                    const noteLengthMatch = noteLength.match(/(\d+)\/(\d+)/);
+                    if (noteLengthMatch) {
+                        noteLengthNumerator = parseInt(noteLengthMatch[1]);
+                        noteLengthDenominator = parseInt(noteLengthMatch[2]);
+                    }
+                }
+                else if (line.includes('|')) {
+                    const chordLine = line.split('%')[0].trim();
+                    
+                    // Преобразуем в доли четверти
+                    // L: 1/4 = 1 четверть
+                    // L: 2/4 = 2 четверти
+                    // L: 1/8 = 0.5 четверти
+                    const chordDurationInQuarters = (noteLengthNumerator / noteLengthDenominator) * 4;
+                    
+                    // Размер такта в долях четверти
+                    // M: 2/4 = 2 четверти
+                    // M: 4/4 = 4 четверти
+                    const barDurationInQuarters = (meterNumerator / meterDenominator) * 4;
+                    
+                    // В ABC нотации каждый аккорд между | - это отдельный такт
+                    // Например: "| Gm | Bb | Eb | D |" - это 4 такта
+                    // Разбиваем строку по | и обрабатываем каждый аккорд как отдельный такт
+                    const parts = chordLine.split('|');
+                    
+                    for (let part of parts) {
+                        const chord = part.trim();
+                        if (chord && chord !== '') {
+                            // Каждый аккорд - это отдельный такт
+                            // Длительность аккорда определяется из L:
+                            // Полная длительность такта определяется из M:
+                            chords.push(chord);
+                            chordDurations.push(chordDurationInQuarters);
+                            barDurations.push(barDurationInQuarters);
+                        }
+                    }
+                }
+            }
+            
+            return {
+                chords: chords,
+                chordDurations: chordDurations,
+                barDurations: barDurations,
+                tempo: tempo,
+                meter: meter,
+                noteLength: noteLength,
+                unknownChords: unknownChords
+            };
+        }
+
+        function convertToMIDI() {
+            // Проверяем наличие библиотеки
+            if (typeof MidiWriter === 'undefined') {
+                alert('Библиотека для создания MIDI не загружена!\n\n' +
+                      'Это может произойти при открытии файла напрямую из файловой системы.\n\n' +
+                      'Решения:\n' +
+                      '1. Используйте функцию "Воспроизвести" для прослушивания\n' +
+                      '2. Откройте файл через локальный веб-сервер\n' +
+                      '3. Или используйте расширение для браузера, которое позволяет загружать внешние скрипты');
+                return;
+            }
+            
+            const abcText = document.getElementById('abcInput').value;
+            const overrideText = document.getElementById('chordOverrides').value;
+            
+            // Парсим пользовательские аккорды
+            const overrides = parseChordOverrides(overrideText);
+            
+            // Объединяем с дефолтными
+            chordNotes = mergeChords(overrides);
+            
+            const parsed = parseABC(abcText);
+            
+            if (parsed.chords.length === 0) {
+                alert('Не найдено аккордов для обработки!');
+                return;
+            }
+            
+            // Проверяем неизвестные аккорды
+            const unknownChords = new Set();
+            const validChords = [];
+            
+            for (let chord of parsed.chords) {
+                if (chordNotes[chord]) {
+                    validChords.push(chord);
+                } else {
+                    unknownChords.add(chord);
+                }
+            }
+            
+            if (unknownChords.size > 0) {
+                const warningDiv = document.getElementById('warning');
+                warningDiv.innerHTML = `<strong>Внимание! Найдены неопределенные аккорды:</strong> ${Array.from(unknownChords).join(', ')}<br>
+                Добавьте их определение в поле "Пользовательские аккорды"`;
+                warningDiv.style.display = 'block';
+                
+                // Показываем только те аккорды, которые определены
+                if (validChords.length === 0) {
+                    alert('Нет определенных аккордов! Добавьте определения для всех аккордов.');
+                    return;
+                }
+            } else {
+                document.getElementById('warning').style.display = 'none';
+            }
+            
+            // Создаем MIDI
+            const MIDI_Writer = MidiWriter;
+            const track = new MIDI_Writer.Track();
+            track.setTempo(parsed.tempo);
+            
+            // Функция для преобразования длительности в долях четверти в формат MIDI
+            function getMidiDuration(quarters) {
+                // Преобразуем доли четверти в стандартные длительности MIDI
+                // 1 = целая, 2 = половинная, 4 = четвертная, 8 = восьмая, 16 = шестнадцатая
+                const midiDurations = [1, 2, 4, 8, 16, 32];
+                const target = 4 / quarters; // Целевая длительность
+                
+                // Находим ближайшую стандартную длительность
+                let closest = midiDurations[0];
+                let minDiff = Math.abs(target - closest);
+                for (let d of midiDurations) {
+                    const diff = Math.abs(target - d);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closest = d;
+                    }
+                }
+                return closest.toString();
+            }
+            
+            validChords.forEach((chord, index) => {
+                const chordInfo = chordNotes[chord];
+                if (chordInfo) {
+                    const midiPitches = chordInfo.notes
+                        .map(note => midiNotes[note])
+                        .filter(pitch => pitch !== undefined);
+                    
+                    if (midiPitches.length > 0) {
+                        // Используем вычисленную длительность аккорда
+                        const chordDurationInQuarters = parsed.chordDurations && parsed.chordDurations[index] 
+                            ? parsed.chordDurations[index]
+                            : 1; // По умолчанию 1 четверть
+                        
+                        // Полная длительность такта
+                        const barDurationInQuarters = parsed.barDurations && parsed.barDurations[index]
+                            ? parsed.barDurations[index]
+                            : 2; // По умолчанию 2 четверти
+                        
+                        // Длительность паузы после аккорда (если такт не заполнен полностью)
+                        const restDurationInQuarters = barDurationInQuarters - chordDurationInQuarters;
+                        
+                        const chordDuration = getMidiDuration(chordDurationInQuarters);
+                        
+                        // Добавляем аккорд
+                        const noteEvent = new MIDI_Writer.NoteEvent({
+                            pitch: midiPitches,
+                            duration: chordDuration,
+                            velocity: 80
+                        });
+                        track.addEvent(noteEvent);
+                        
+                        // Добавляем паузу, если такт не заполнен полностью
+                        if (restDurationInQuarters > 0) {
+                            const restDuration = getMidiDuration(restDurationInQuarters);
+                            const restEvent = new MIDI_Writer.NoteEvent({
+                                pitch: [],
+                                duration: restDuration,
+                                velocity: 0
+                            });
+                            track.addEvent(restEvent);
+                        }
+                    }
+                }
+            });
+            
+            const write = new MIDI_Writer.Writer([track]);
+            const midiData = write.buildFile();
+            
+            const blob = new Blob([midiData], { type: 'audio/midi' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'bud_spokoen.mid';
+            link.click();
+            
+            let message = `MIDI файл создан!\n`;
+            message += `Аккордов обработано: ${validChords.length}\n`;
+            message += `Темп: ${parsed.tempo} BPM\n`;
+            if (unknownChords.size > 0) {
+                message += `Пропущено неизвестных аккордов: ${unknownChords.size}`;
+            }
+            
+            alert(message);
+        }
+
+        function previewABC() {
+            const abcText = document.getElementById('abcInput').value;
+            const overrideText = document.getElementById('chordOverrides').value;
+            
+            const overrides = parseChordOverrides(overrideText);
+            chordNotes = mergeChords(overrides);
+            
+            const parsed = parseABC(abcText);
+            
+            // Собираем статистику по аккордам
+            const chordStats = {};
+            const unknownChords = new Set();
+            
+            for (let chord of parsed.chords) {
+                if (chordNotes[chord]) {
+                    chordStats[chord] = (chordStats[chord] || 0) + 1;
+                } else {
+                    unknownChords.add(chord);
+                }
+            }
+            
+            let previewText = '=== РЕЗУЛЬТАТ ПАРСИНГА ===\n\n';
+            previewText += `Темп: ${parsed.tempo} BPM\n`;
+            previewText += `Размер: ${parsed.meter}\n`;
+            previewText += `Всего аккордов: ${parsed.chords.length}\n`;
+            previewText += `Уникальных аккордов: ${Object.keys(chordStats).length}\n\n`;
+            
+            if (unknownChords.size > 0) {
+                previewText += `⚠️ НЕОПРЕДЕЛЕННЫЕ АККОРДЫ: ${Array.from(unknownChords).join(', ')}\n\n`;
+            }
+            
+            previewText += 'Аккорды в песне (с количеством вхождений):\n';
+            
+            // Сортируем аккорды по частоте появления
+            const sortedChords = Object.entries(chordStats)
+                .sort((a, b) => b[1] - a[1]);
+            
+            for (let [chord, count] of sortedChords) {
+                const info = chordNotes[chord];
+                const source = info && info.name.includes('Пользовательский') ? ' (польз.)' : '';
+                previewText += `${chord}: ${count} раз - ${info ? info.notes.join(', ') : '???'}${source}\n`;
+            }
+            
+            if (Object.keys(overrides).length > 0) {
+                previewText += '\nПользовательские определения аккордов:\n';
+                for (let [chord, info] of Object.entries(overrides)) {
+                    previewText += `${chord}: ${info.notes.join(', ')}\n`;
+                }
+            }
+            
+            document.getElementById('preview').textContent = previewText;
+            document.getElementById('warning').style.display = unknownChords.size > 0 ? 'block' : 'none';
+            if (unknownChords.size > 0) {
+                document.getElementById('warning').innerHTML = 
+                    `<strong>Внимание! Найдены неопределенные аккорды:</strong> ${Array.from(unknownChords).join(', ')}`;
+            }
+        }
+
+        function resetToDefault() {
+            document.getElementById('chordOverrides').value = `Gm G3 Bb3 D3
+G G3 B3 D3
+Bb Bb3 D3 F3
+Eb Eb3 G3 Bb3
+D D3 F#3 A3
+F F3 A3 C4`;
+            chordNotes = JSON.parse(JSON.stringify(defaultChordNotes));
+            previewABC();
+        }
+
+        // Преобразование MIDI ноты в частоту (Гц)
+        function midiToFrequency(midiNote) {
+            return 440 * Math.pow(2, (midiNote - 69) / 12);
+        }
+
+        // Воспроизведение одной ноты
+        function playNote(frequency, duration, startTime, audioContext) {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine'; // Можно изменить на 'triangle', 'sawtooth', 'square'
+            
+            // Огибающая для плавного звука
+            const now = audioContext.currentTime;
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(0.3, now + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + duration);
+        }
+
+        // Воспроизведение аккорда
+        function playChord(chordInfo, startTime, audioContext, duration) {
+            if (!chordInfo || !chordInfo.notes) return;
+            
+            chordInfo.notes.forEach(note => {
+                const midiNote = midiNotes[note];
+                if (midiNote !== undefined) {
+                    const frequency = midiToFrequency(midiNote);
+                    playNote(frequency, duration, startTime, audioContext);
+                }
+            });
+        }
+
+        // Переключение воспроизведения/паузы
+        function togglePlayback() {
+            if (isPaused) {
+                resumePlayback();
+            } else if (isPlaying) {
+                pausePlayback();
+            } else {
+                playComposition();
+            }
+        }
+
+        // Воспроизведение композиции
+        function playComposition() {
+            const abcText = document.getElementById('abcInput').value;
+            const overrideText = document.getElementById('chordOverrides').value;
+            
+            // Парсим пользовательские аккорды
+            const overrides = parseChordOverrides(overrideText);
+            chordNotes = mergeChords(overrides);
+            
+            const parsed = parseABC(abcText);
+            
+            if (parsed.chords.length === 0) {
+                alert('Не найдено аккордов для обработки!');
+                return;
+            }
+            
+            // Проверяем неизвестные аккорды
+            const unknownChords = new Set();
+            const validChords = [];
+            
+            for (let chord of parsed.chords) {
+                if (chordNotes[chord]) {
+                    validChords.push(chord);
+                } else {
+                    unknownChords.add(chord);
+                }
+            }
+            
+            if (unknownChords.size > 0) {
+                const warningDiv = document.getElementById('warning');
+                warningDiv.innerHTML = `<strong>Внимание! Найдены неопределенные аккорды:</strong> ${Array.from(unknownChords).join(', ')}<br>
+                Добавьте их определение в поле "Пользовательские аккорды"`;
+                warningDiv.style.display = 'block';
+                
+                if (validChords.length === 0) {
+                    alert('Нет определенных аккордов! Добавьте определения для всех аккордов.');
+                    return;
+                }
+            } else {
+                document.getElementById('warning').style.display = 'none';
+            }
+            
+            // Инициализируем AudioContext
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // Если контекст приостановлен, возобновляем
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            isPlaying = true;
+            isPaused = false;
+            playbackChords = validChords.map(chord => chordNotes[chord]).filter(chord => chord);
+            playbackChordDurations = parsed.chordDurations || playbackChords.map(() => 1); // По умолчанию 1 четверть
+            playbackBarDurations = parsed.barDurations || playbackChords.map(() => 2); // По умолчанию 2 четверти (M: 2/4)
+            playbackTempo = parsed.tempo;
+            currentChordIndex = 0;
+            startTime = audioContext.currentTime;
+            pausedTime = 0;
+            
+            // Обновляем UI
+            document.getElementById('playBtn').textContent = '⏸ Пауза';
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('playerControls').style.display = 'block';
+            
+            // Вычисляем общую длительность с учетом полных длительностей тактов
+            const quarterNoteDuration = 60 / playbackTempo; // Длительность четвертной ноты в секундах
+            const totalDuration = playbackBarDurations.reduce((sum, duration) => sum + duration, 0) * quarterNoteDuration;
+            document.getElementById('totalTime').textContent = formatTime(totalDuration);
+            
+            // Запускаем обновление прогресса
+            startProgressUpdate();
+            
+            // Запускаем воспроизведение
+            scheduleNextChord();
+        }
+
+        // Пауза воспроизведения
+        function pausePlayback() {
+            if (!isPlaying || isPaused) return;
+            
+            isPaused = true;
+            pauseStartTime = audioContext.currentTime;
+            
+            if (playbackTimeout) {
+                clearTimeout(playbackTimeout);
+                playbackTimeout = null;
+            }
+            
+            stopProgressUpdate();
+            
+            // Обновляем UI
+            document.getElementById('playBtn').textContent = '▶ Воспроизвести';
+        }
+
+        // Возобновление воспроизведения
+        function resumePlayback() {
+            if (!isPaused) return;
+            
+            // Добавляем время паузы
+            pausedTime += audioContext.currentTime - pauseStartTime;
+            
+            isPaused = false;
+            
+            // Обновляем UI
+            document.getElementById('playBtn').textContent = '⏸ Пауза';
+            
+            // Возобновляем обновление прогресса
+            startProgressUpdate();
+            
+            // Возобновляем воспроизведение
+            scheduleNextChord();
+        }
+
+        // Планирование следующего аккорда
+        function scheduleNextChord() {
+            if (!isPlaying || isPaused || currentChordIndex >= playbackChords.length) {
+                if (currentChordIndex >= playbackChords.length) {
+                    stopPlayback();
+                }
+                return;
+            }
+            
+            // Получаем длительность текущего аккорда в долях четверти
+            const chordDurationInQuarters = playbackChordDurations[currentChordIndex] || 1;
+            
+            // Получаем полную длительность текущего такта в долях четверти
+            const barDurationInQuarters = playbackBarDurations[currentChordIndex] || 2;
+            
+            // Вычисляем длительность в секундах
+            const quarterNoteDuration = 60 / playbackTempo; // Длительность четвертной ноты в секундах
+            const chordDuration = chordDurationInQuarters * quarterNoteDuration;
+            const barDuration = barDurationInQuarters * quarterNoteDuration; // Полная длительность такта
+            
+            const currentTime = audioContext.currentTime;
+            const scheduledTime = currentTime;
+            
+            // Воспроизводим текущий аккорд (звучит свою длительность, затем пауза до конца такта)
+            playChord(playbackChords[currentChordIndex], scheduledTime, audioContext, chordDuration);
+            
+            currentChordIndex++;
+            
+            // Планируем следующий аккорд через полную длительность такта (не только длительность аккорда!)
+            playbackTimeout = setTimeout(() => {
+                scheduleNextChord();
+            }, barDuration * 1000);
+        }
+
+        // Запуск обновления прогресса
+        function startProgressUpdate() {
+            if (progressUpdateInterval) {
+                clearInterval(progressUpdateInterval);
+            }
+            
+            progressUpdateInterval = setInterval(() => {
+                if (!isPlaying || isPaused) return;
+                
+                const currentTime = audioContext.currentTime;
+                const elapsed = currentTime - startTime - pausedTime;
+                
+                // Вычисляем общую длительность с учетом полных длительностей тактов
+                const quarterNoteDuration = 60 / playbackTempo;
+                const totalDuration = playbackBarDurations.reduce((sum, duration) => sum + duration, 0) * quarterNoteDuration;
+                
+                const progress = Math.min((elapsed / totalDuration) * 100, 100);
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('currentTime').textContent = formatTime(Math.min(elapsed, totalDuration));
+            }, 100); // Обновляем каждые 100мс
+        }
+
+        // Остановка обновления прогресса
+        function stopProgressUpdate() {
+            if (progressUpdateInterval) {
+                clearInterval(progressUpdateInterval);
+                progressUpdateInterval = null;
+            }
+        }
+
+        // Остановка воспроизведения
+        function stopPlayback() {
+            isPlaying = false;
+            isPaused = false;
+            currentChordIndex = 0;
+            
+            if (playbackTimeout) {
+                clearTimeout(playbackTimeout);
+                playbackTimeout = null;
+            }
+            
+            stopProgressUpdate();
+            
+            // Обновляем UI
+            document.getElementById('playBtn').textContent = '▶ Воспроизвести';
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('currentTime').textContent = '0:00';
+            
+            // Останавливаем все осцилляторы (если нужно)
+            if (audioContext) {
+                audioContext.suspend().then(() => {
+                    audioContext.resume();
+                });
+            }
+        }
+
+        // Форматирование времени
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Проверка протокола и загрузки библиотеки
+        function checkEnvironment() {
+            // Проверяем, открыт ли файл локально
+            if (window.location.protocol === 'file:') {
+                document.getElementById('fileProtocolInfo').style.display = 'block';
+            }
+            
+            // Проверяем загрузку библиотеки midi-writer-js
+            setTimeout(() => {
+                if (typeof MidiWriter === 'undefined') {
+                    const warningDiv = document.getElementById('warning');
+                    warningDiv.innerHTML = `<strong>⚠️ Внимание!</strong> Библиотека для создания MIDI не загружена.<br>
+                    Это может произойти при открытии файла напрямую из файловой системы.<br>
+                    <strong>Решения:</strong><br>
+                    1. Используйте функцию "Воспроизвести" для прослушивания (работает без библиотеки)<br>
+                    2. Откройте файл через локальный веб-сервер (например, через Python: <code>python -m http.server</code>)<br>
+                    3. Или используйте расширение для браузера, которое позволяет загружать внешние скрипты`;
+                    warningDiv.style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        // Инициализация
+        window.onload = function() {
+            checkEnvironment();
+            resetToDefault();
+        };
+    </script>
+</body>
+</html>
