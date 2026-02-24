@@ -198,7 +198,7 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                     <label>
                                         <span>Расстояние между линиями нотного стана:</span>
                                         <select
-                                            value={options.staffLineSpacing || 3}
+                                            value={options.staffLineSpacing !== undefined ? options.staffLineSpacing : 2}
                                             onChange={(e) => handleOptionChange('staffLineSpacing', parseFloat(e.target.value))}
                                         >
                                             {staffLineSpacingOptions.map(spacing => (
@@ -213,7 +213,7 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                     <label>
                                         <span>Расстояние между нотными станами:</span>
                                         <select
-                                            value={options.staffSpacing || 16}
+                                            value={options.staffSpacing !== undefined ? options.staffSpacing : 8}
                                             onChange={(e) => handleOptionChange('staffSpacing', parseInt(e.target.value))}
                                         >
                                             {staffSpacingOptions.map(spacing => (
@@ -243,7 +243,7 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                     <label>
                                         <span>Толщина линий нотного стана:</span>
                                         <select
-                                            value={options.staffLineWidth !== undefined ? options.staffLineWidth : 0.35}
+                                            value={options.staffLineWidth !== undefined ? options.staffLineWidth : 0.1}
                                             onChange={(e) => handleOptionChange('staffLineWidth', parseFloat(e.target.value))}
                                         >
                                             {staffLineWidthOptions.map(width => (

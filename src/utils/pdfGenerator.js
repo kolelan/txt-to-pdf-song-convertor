@@ -91,8 +91,8 @@ export const generatePdf = async (parsedData, options) => {
               // Рисуем нотный стан вместо текста
               // Нотный стан должен начинаться на той же строке, что и аккорды
               const staffWidth = 120; // Ширина нотного стана
-              const staffLineSpacing = options.staffLineSpacing || 3; // Расстояние между линиями внутри стана
-              const staffLineWidth = options.staffLineWidth !== undefined ? options.staffLineWidth : 0.35; // Толщина линий
+              const staffLineSpacing = options.staffLineSpacing !== undefined ? options.staffLineSpacing : 2; // Расстояние между линиями внутри стана
+              const staffLineWidth = options.staffLineWidth !== undefined ? options.staffLineWidth : 0.1; // Толщина линий
               const staffLineCount = options.staffLineCount !== undefined ? options.staffLineCount : 5; // Количество линий
               // Базовый сдвиг вверх 5px + настраиваемый сдвиг из опций
               const baseOffset = -5; // Базовый сдвиг вверх на 5px
@@ -105,7 +105,7 @@ export const generatePdf = async (parsedData, options) => {
               // Используем специальное расстояние между станами
               // Учитываем высоту стана (количество промежутков = количество линий - 1) + дополнительное расстояние
               const staffHeight = (staffLineCount - 1) * staffLineSpacing; // Высота стана (промежутки между линиями)
-              const staffSpacing = options.staffSpacing || 16;
+              const staffSpacing = options.staffSpacing !== undefined ? options.staffSpacing : 8;
               yPosition += staffHeight + staffSpacing; // Перемещаемся на высоту стана + расстояние до следующего
             } else if (options.showLyrics && measure.lyrics) {
               // Отображаем текст песни

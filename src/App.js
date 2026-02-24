@@ -50,10 +50,10 @@ K: Ab
         fontStyle: 'normal',
         instrument: 'guitar',
         capo: 0,
-        staffLineSpacing: 3,
-        staffSpacing: 16,
+        staffLineSpacing: 2,
+        staffSpacing: 8,
         staffVerticalOffset: 0,
-        staffLineWidth: 0.35,
+        staffLineWidth: 0.1,
         staffLineCount: 5
     });
     useEffect(() => {
