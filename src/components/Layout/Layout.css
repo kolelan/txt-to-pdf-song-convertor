@@ -53,6 +53,18 @@
     flex-shrink: 0;
     max-height: 40vh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-footer {
+    background: #ecf0f1;
+    padding: 0.5rem;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #7f8c8d;
 }
 
 /* Адаптивность для маленьких экранов */
@@ -84,5 +96,10 @@
 
     .layout-controls {
         max-height: 30vh;
+    }
+
+    .layout-footer {
+        font-size: 0.8rem;
+        padding: 0.4rem;
     }
 }

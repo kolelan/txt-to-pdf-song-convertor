@@ -2,6 +2,27 @@ import { jsPDF } from 'jspdf';
 import { registerCyrillicFont, safeText } from './cyrillicFonts';
 import { getBarStatistics } from './barCounter';
 
+// Функция для рисования нотного стана
+// y - позиция верхней линии стана (базовая линия текста аккордов)
+// lineSpacing - расстояние между линиями
+// lineWidth - толщина линий
+const drawStaff = (doc, x, y, width, lineSpacing = 3, lineWidth = 0.35) => {
+  // Сохраняем текущую толщину линии
+  const currentLineWidth = doc.getLineWidth();
+  // Устанавливаем толщину линий нотного стана
+  doc.setLineWidth(lineWidth);
+  
+  // Рисуем 5 горизонтальных линий нотного стана на равном расстоянии
+  // Верхняя линия на позиции y, остальные ниже
+  for (let i = 0; i < 5; i++) {
+    const lineY = y + (i * lineSpacing);
+    doc.line(x, lineY, x + width, lineY);
+  }
+  
+  // Восстанавливаем исходную толщину линии
+  doc.setLineWidth(currentLineWidth);
+};
+
 export const generatePdf = async (parsedData, options) => {
   try {
     const doc = new jsPDF();
@@ -64,13 +85,35 @@ export const generatePdf = async (parsedData, options) => {
               safeText(doc, measure.chordPart, margin, yPosition);
             }
 
-            // Отображаем текст с выравниванием
-            if (options.showLyrics && measure.lyrics) {
+            // Отображаем нотный стан или текст с выравниванием
+            if (options.showStaff) {
+              // Рисуем нотный стан вместо текста
+              // Нотный стан должен начинаться на той же строке, что и аккорды
+              const staffWidth = 120; // Ширина нотного стана
+              const staffLineSpacing = options.staffLineSpacing || 3; // Расстояние между линиями внутри стана
+              const staffLineWidth = options.staffLineWidth !== undefined ? options.staffLineWidth : 0.35; // Толщина линий
+              // Базовый сдвиг вверх 5px + настраиваемый сдвиг из опций
+              const baseOffset = -5; // Базовый сдвиг вверх на 5px
+              const customOffset = options.staffVerticalOffset !== undefined ? options.staffVerticalOffset : 0;
+              const totalOffset = baseOffset + customOffset;
+              const staffY = yPosition + totalOffset; // Позиция по Y с учетом сдвига (верхняя линия стана)
+              const staffX = fixedTextOffset; // Позиция по X (там же, где обычно текст)
+              drawStaff(doc, staffX, staffY, staffWidth, staffLineSpacing, staffLineWidth);
+              
+              // Используем специальное расстояние между станами
+              // Учитываем высоту стана (4 промежутка между 5 линиями) + дополнительное расстояние
+              const staffHeight = 4 * staffLineSpacing; // Высота стана (4 промежутка между 5 линиями)
+              const staffSpacing = options.staffSpacing || 16;
+              yPosition += staffHeight + staffSpacing; // Перемещаемся на высоту стана + расстояние до следующего
+            } else if (options.showLyrics && measure.lyrics) {
+              // Отображаем текст песни
               doc.setFont(options.fontFamily, 'normal');
               safeText(doc, measure.lyrics, fixedTextOffset, yPosition);
+              yPosition += lineHeight;
+            } else {
+              // Если ни текст, ни нотный стан не отображаются, используем обычный lineHeight
+              yPosition += lineHeight;
             }
-
-            yPosition += lineHeight;
 
             if (yPosition > 270) {
               doc.addPage();

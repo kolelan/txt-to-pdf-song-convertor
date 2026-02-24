@@ -53,7 +53,7 @@ export const registerCyrillicFont = async (doc) => {
         doc.addFont('PTMono-Regular.ttf', 'PT Mono', 'normal');
 
         // Устанавливаем Roboto Mono по умолчанию
-        doc.setFont('Roboto Mono', 'normal');
+        doc.setFont('Roboto Mono', 'italic');
 
         return true;
 

@@ -1,3 +1,21 @@
-.footer-message {
+.footer {
+    padding: 0.5rem;
     text-align: center;
+}
+
+.footer-message {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .footer {
+        padding: 0.4rem;
+    }
+
+    .footer-message {
+        font-size: 0.8rem;
+    }
 }

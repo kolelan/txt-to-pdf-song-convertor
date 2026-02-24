@@ -10,8 +10,12 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
     };
 
     const fontSizeOptions = [8, 9, 10, 11, 12, 14, 16, 18, 20];
-    const lineHeightOptions = [0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8];
+    const lineHeightOptions = [0.3, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8];
     const offsetOptions = [50, 60, 70, 80, 90, 100];
+    const staffLineSpacingOptions = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8];
+    const staffSpacingOptions = [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
+    const staffVerticalOffsetOptions = [-10, -8, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 10];
+    const staffLineWidthOptions = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0];
     const fontFamilyOptions = ['Roboto Mono', 'PT Mono', 'Courier', 'Helvetica'];
     const fontStyleOptions = [
         { value: 'normal', label: 'Normal' },
@@ -96,6 +100,14 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                 />
                                 <span>Статистика</span>
                             </label>
+                            <label className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    checked={options.showStaff}
+                                    onChange={(e) => handleOptionChange('showStaff', e.target.checked)}
+                                />
+                                <span>Нотоносец</span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -149,10 +161,89 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                 </select>
                             </label>
                         </div>
+                        <div className="control-item">
+                            <label>
+                                <span>Отступы страницы:</span>
+                                <select
+                                    value={options.pageMargins || 20}
+                                    onChange={(e) => handleOptionChange('pageMargins', parseInt(e.target.value))}
+                                >
+                                    <option value={10}>10px</option>
+                                    <option value={15}>15px</option>
+                                    <option value={20}>20px</option>
+                                    <option value={25}>25px</option>
+                                    <option value={30}>30px</option>
+                                </select>
+                            </label>
+                        </div>
+                        {options.showStaff && (
+                            <>
+                                <div className="control-item">
+                                    <label>
+                                        <span>Расстояние между линиями нотного стана:</span>
+                                        <select
+                                            value={options.staffLineSpacing || 3}
+                                            onChange={(e) => handleOptionChange('staffLineSpacing', parseFloat(e.target.value))}
+                                        >
+                                            {staffLineSpacingOptions.map(spacing => (
+                                                <option key={spacing} value={spacing}>
+                                                    {spacing}px
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+                                <div className="control-item">
+                                    <label>
+                                        <span>Расстояние между нотными станами:</span>
+                                        <select
+                                            value={options.staffSpacing || 16}
+                                            onChange={(e) => handleOptionChange('staffSpacing', parseInt(e.target.value))}
+                                        >
+                                            {staffSpacingOptions.map(spacing => (
+                                                <option key={spacing} value={spacing}>
+                                                    {spacing}px
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+                                <div className="control-item">
+                                    <label>
+                                        <span>Вертикальный сдвиг нотного стана:</span>
+                                        <select
+                                            value={options.staffVerticalOffset !== undefined ? options.staffVerticalOffset : 0}
+                                            onChange={(e) => handleOptionChange('staffVerticalOffset', parseInt(e.target.value))}
+                                        >
+                                            {staffVerticalOffsetOptions.map(offset => (
+                                                <option key={offset} value={offset}>
+                                                    {offset > 0 ? `+${offset}px` : `${offset}px`}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+                                <div className="control-item">
+                                    <label>
+                                        <span>Толщина линий нотного стана:</span>
+                                        <select
+                                            value={options.staffLineWidth !== undefined ? options.staffLineWidth : 0.35}
+                                            onChange={(e) => handleOptionChange('staffLineWidth', parseFloat(e.target.value))}
+                                        >
+                                            {staffLineWidthOptions.map(width => (
+                                                <option key={width} value={width}>
+                                                    {width}px
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
-                {/* Колонка 3: Шрифты и инструмент */}
+                {/* Колонка 3: Шрифты */}
                 <div className="control-column">
                     <div className="settings-group">
                         <h4>Шрифт</h4>
@@ -171,23 +262,11 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                 </select>
                             </label>
                         </div>
-                        <div className="control-item">
-                            <label>
-                                <span>Стиль шрифта:</span>
-                                <select
-                                    value={options.fontStyle || 'normal'}
-                                    onChange={(e) => handleOptionChange('fontStyle', e.target.value)}
-                                >
-                                    {fontStyleOptions.map(style => (
-                                        <option key={style.value} value={style.value}>
-                                            {style.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                        </div>
                     </div>
+                </div>
 
+                {/* Колонка 4: Инструмент */}
+                <div className="control-column">
                     <div className="settings-group">
                         <h4>Инструмент</h4>
                         <div className="control-item">

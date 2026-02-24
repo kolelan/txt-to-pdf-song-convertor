@@ -42,13 +42,18 @@ K: Ab
         showTitle: true,
         showLegend: true,
         showStatistics: true,
+        showStaff: false,
         fontSize: 12,
         lineHeight: 0.4,
         fixedTextOffset: 80,
         fontFamily: 'Roboto Mono',
         fontStyle: 'normal',
         instrument: 'guitar',
-        capo: 0
+        capo: 0,
+        staffLineSpacing: 3,
+        staffSpacing: 16,
+        staffVerticalOffset: 0,
+        staffLineWidth: 0.35
     });
     useEffect(() => {
         try {

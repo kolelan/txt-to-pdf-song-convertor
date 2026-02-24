@@ -1,7 +1,7 @@
 import React from 'react';
 import './Layout.css';
 
-const Layout = ({ leftPanel, rightPanel, controls,footer }) => {
+const Layout = ({ leftPanel, rightPanel, controls, footer }) => {
     return (
         <div className="layout">
             <div className="layout-header">
@@ -22,6 +22,7 @@ const Layout = ({ leftPanel, rightPanel, controls,footer }) => {
             <div className="layout-controls">
                 {controls}
             </div>
+
             <div className="layout-footer">
                 {footer}
             </div>
