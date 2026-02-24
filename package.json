@@ -17,9 +17,13 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:custom": "node scripts/build.js",
+    "build:ttp_v3": "node scripts/build.js --base-url=ttp_v3 --relative-paths",
+    "build:ttp_v3:absolute": "node scripts/build.js --base-url=ttp_v3 --absolute-paths",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "homepage": ".",
   "eslintConfig": {
     "extends": [
       "react-app",

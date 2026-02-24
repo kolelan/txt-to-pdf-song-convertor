@@ -31,6 +31,41 @@ npm start
 
 Приложение будет доступно по адресу: `http://localhost:3000`
 
+### Сборка для production
+
+#### Стандартная сборка (корень домена)
+```bash
+npm run build
+```
+
+#### Сборка с базовым URL и относительными путями
+```bash
+# Для папки ttp_v3 с относительными путями
+npm run build:ttp_v3
+
+# Или с произвольным базовым URL
+npm run build:custom -- --base-url=ttp_v3 --relative-paths
+```
+
+#### Сборка с базовым URL и абсолютными путями
+```bash
+# Для папки ttp_v3 с абсолютными путями
+npm run build:ttp_v3:absolute
+
+# Или с произвольным базовым URL
+npm run build:custom -- --base-url=ttp_v3 --absolute-paths
+```
+
+**Параметры сборки:**
+- `--base-url=<url>` - Базовый URL (например, `ttp_v3`). По умолчанию: корень домена
+- `--relative-paths` - Использовать относительные пути к JS/CSS файлам (по умолчанию)
+- `--absolute-paths` - Использовать абсолютные пути к JS/CSS файлам
+
+**Примеры:**
+- `npm run build:custom -- --base-url=ttp_v3 --relative-paths` - сборка для `/ttp_v3/` с относительными путями
+- `npm run build:custom -- --base-url=ttp_v3 --absolute-paths` - сборка для `/ttp_v3/` с абсолютными путями от корня
+- `npm run build:custom -- --base-url=myapp --relative-paths` - сборка для `/myapp/` с относительными путями
+
 ### Использование
 
 1. **Введите текст** в левой части в формате ABC нотации
