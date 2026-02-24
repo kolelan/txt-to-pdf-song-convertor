@@ -93,14 +93,14 @@ try {
     const indexPath = path.join(__dirname, '..', 'build', 'index.html');
     if (fs.existsSync(indexPath)) {
       let indexContent = fs.readFileSync(indexPath, 'utf8');
-      // Заменяем абсолютные пути /ttp_v4/ на относительные ttp_v4/
+      // Заменяем абсолютные пути /ttp_v4/ на относительные (без префикса)
+      // Когда приложение развернуто в ttp_v4/, пути должны быть относительно этой папки
       const absolutePath = baseUrl.startsWith('/') ? baseUrl : '/' + baseUrl;
-      const relativePath = baseUrl.replace(/^\/+/, '').replace(/\/+$/, ''); // Убираем слэши в начале и конце
-      // Заменяем /ttp_v4/ на ttp_v4/ (убираем начальный слэш)
+      // Для относительных путей убираем префикс полностью - файлы уже в нужной папке
       const regex = new RegExp(absolutePath.replace(/\//g, '\\/') + '/', 'g');
-      indexContent = indexContent.replace(regex, relativePath + '/');
+      indexContent = indexContent.replace(regex, '');
       fs.writeFileSync(indexPath, indexContent, 'utf8');
-      console.log('   ✏️  Пути в index.html заменены на относительные');
+      console.log('   ✏️  Пути в index.html заменены на относительные (без префикса базового URL)');
     }
   }
   
