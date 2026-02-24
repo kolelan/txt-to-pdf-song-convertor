@@ -1,7 +1,23 @@
 import React from 'react';
+import { formatTime } from '../../utils/midiConverter';
 import './Controls.css';
 
-const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData }) => {
+const Controls = ({ 
+    options, 
+    onOptionsChange, 
+    onGeneratePdf, 
+    onConvertToMIDI, 
+    onPreviewChords,
+    onTogglePlayback,
+    onStopPlayback,
+    isPlaying,
+    isPaused,
+    currentTime,
+    totalTime,
+    progress,
+    loading, 
+    hasData 
+}) => {
     const handleOptionChange = (key, value) => {
         onOptionsChange({
             ...options,
@@ -312,6 +328,137 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                                 />
                             </label>
                         </div>
+                        <div className="control-item">
+                            <label>
+                                <span>Пользовательские аккорды:</span>
+                                <textarea
+                                    value={options.chordOverrides || ''}
+                                    onChange={(e) => handleOptionChange('chordOverrides', e.target.value)}
+                                    placeholder="Gm G3 Bb3 D3&#10;G G3 B3 D3&#10;Формат: Название_аккорда нота1 нота2 нота3 ..."
+                                    rows={6}
+                                    style={{
+                                        width: '100%',
+                                        fontFamily: 'monospace',
+                                        fontSize: '11px',
+                                        padding: '5px',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        resize: 'vertical'
+                                    }}
+                                />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Элементы управления MIDI - ниже остальных */}
+            <div className="midi-controls" style={{ marginTop: '20px', paddingTop: '20px', borderTop: '2px solid #ddd' }}>
+                <div className="settings-group">
+                    <h4>Воспроизведение</h4>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
+                        <button
+                            onClick={() => onTogglePlayback && onTogglePlayback()}
+                            disabled={!hasData}
+                            style={{
+                                background: isPlaying && !isPaused ? '#FF9800' : '#4CAF50',
+                                color: 'white',
+                                padding: '10px 20px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: !hasData ? 'not-allowed' : 'pointer',
+                                fontSize: '14px',
+                                opacity: !hasData ? 0.6 : 1
+                            }}
+                        >
+                            {isPlaying && !isPaused ? '⏸ Пауза' : '▶ Воспроизвести'}
+                        </button>
+                        <button
+                            onClick={() => onStopPlayback && onStopPlayback()}
+                            disabled={!isPlaying}
+                            style={{
+                                background: '#f44336',
+                                color: 'white',
+                                padding: '10px 20px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: !isPlaying ? 'not-allowed' : 'pointer',
+                                fontSize: '14px',
+                                opacity: !isPlaying ? 0.6 : 1
+                            }}
+                        >
+                            ⏹ Остановить
+                        </button>
+                    </div>
+                    
+                    {/* Прогресс-бар */}
+                    {isPlaying && (
+                        <div style={{ marginTop: '10px' }}>
+                            <div style={{
+                                width: '100%',
+                                height: '8px',
+                                background: '#e0e0e0',
+                                borderRadius: '4px',
+                                overflow: 'hidden',
+                                marginBottom: '5px'
+                            }}>
+                                <div style={{
+                                    height: '100%',
+                                    background: '#4CAF50',
+                                    width: `${progress}%`,
+                                    transition: 'width 0.1s linear'
+                                }} />
+                            </div>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                fontSize: '12px',
+                                color: '#666'
+                            }}>
+                                <span>{formatTime(currentTime)}</span>
+                                <span>{formatTime(totalTime)}</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                
+                <div className="settings-group" style={{ marginTop: '15px' }}>
+                    <h4>Конвертация в MIDI</h4>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        <button
+                            onClick={() => onConvertToMIDI && onConvertToMIDI()}
+                            className="midi-btn"
+                            disabled={loading || !hasData}
+                            style={{
+                                background: '#4CAF50',
+                                color: 'white',
+                                padding: '10px 20px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: loading || !hasData ? 'not-allowed' : 'pointer',
+                                fontSize: '14px',
+                                opacity: loading || !hasData ? 0.6 : 1
+                            }}
+                        >
+                            {loading ? '⏳ Генерация...' : '📥 Скачать MIDI'}
+                        </button>
+                        <button
+                            onClick={() => onPreviewChords && onPreviewChords()}
+                            className="midi-btn secondary"
+                            disabled={!hasData}
+                            style={{
+                                background: '#2196F3',
+                                color: 'white',
+                                padding: '10px 20px',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: !hasData ? 'not-allowed' : 'pointer',
+                                fontSize: '14px',
+                                opacity: !hasData ? 0.6 : 1
+                            }}
+                        >
+                            🔍 Проверить аккорды
+                        </button>
                     </div>
                 </div>
             </div>

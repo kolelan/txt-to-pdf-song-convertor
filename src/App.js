@@ -5,7 +5,17 @@ import PdfPreview from './components/PdfPreview/PdfPreview';
 import Controls from './components/Controls/Controls';
 import {parseAbcNotation} from './utils/abcParser';
 import {generatePdf} from './utils/pdfGenerator';
-import {analyzeBarsFromText, getBarStatistics} from './utils/barCounter'; // Импортируем функции подсчёта
+import {analyzeBarsFromText, getBarStatistics} from './utils/barCounter';
+import {
+    parseABCForMIDI,
+    parseChordOverrides,
+    mergeChords,
+    defaultChordNotes,
+    midiNotes,
+    getMidiDuration
+} from './utils/midiConverter';
+import {useMidiPlayer} from './hooks/useMidiPlayer';
+import * as MidiWriter from 'midi-writer-js';
 import './App.css';
 import Footer from "./components/Footer/Footer";
 
@@ -54,7 +64,8 @@ K: Ab
         staffSpacing: 8,
         staffVerticalOffset: 0,
         staffLineWidth: 0.1,
-        staffLineCount: 5
+        staffLineCount: 5,
+        chordOverrides: ''
     });
     useEffect(() => {
         try {
@@ -129,6 +140,199 @@ K: Ab
         setOptions(newOptions);
     };
 
+    // Хук для воспроизведения MIDI
+    const {
+        isPlaying,
+        isPaused,
+        currentTime,
+        totalTime,
+        progress,
+        togglePlayback,
+        stopPlayback
+    } = useMidiPlayer(inputText, options.chordOverrides);
+
+    const handleConvertToMIDI = async () => {
+        if (!parsedData || !inputText) {
+            const message = 'Нет данных для конвертации в MIDI!';
+            console.log(message);
+            alert(message);
+            return;
+        }
+
+        try {
+            // Парсим ABC нотацию для MIDI
+            const parsed = parseABCForMIDI(inputText);
+            
+            if (parsed.chords.length === 0) {
+                const message = 'Не найдено аккордов для обработки!';
+                console.log(message);
+                alert(message);
+                return;
+            }
+
+            // Парсим пользовательские аккорды
+            const overrides = parseChordOverrides(options.chordOverrides || '', midiNotes);
+            const chordNotes = mergeChords(defaultChordNotes, overrides);
+
+            // Проверяем неизвестные аккорды
+            const unknownChords = new Set();
+            const validChords = [];
+
+            for (let chord of parsed.chords) {
+                if (chordNotes[chord]) {
+                    validChords.push(chord);
+                } else {
+                    unknownChords.add(chord);
+                }
+            }
+
+            if (unknownChords.size > 0) {
+                const confirmMessage = `Внимание! Найдены неопределенные аккорды: ${Array.from(unknownChords).join(', ')}\n\n` +
+                    `Добавьте их определение в поле "Пользовательские аккорды".\n\n` +
+                    `Продолжить с доступными аккордами?`;
+                console.log(confirmMessage);
+                const proceed = window.confirm(confirmMessage);
+                if (!proceed || validChords.length === 0) {
+                    return;
+                }
+            }
+
+            // Создаем MIDI
+            const track = new MidiWriter.Track();
+            track.setTempo(parsed.tempo);
+
+            validChords.forEach((chord, index) => {
+                const chordInfo = chordNotes[chord];
+                if (chordInfo) {
+                    const midiPitches = chordInfo.notes
+                        .map(note => midiNotes[note])
+                        .filter(pitch => pitch !== undefined);
+
+                    if (midiPitches.length > 0) {
+                        const chordDurationInQuarters = parsed.chordDurations && parsed.chordDurations[index]
+                            ? parsed.chordDurations[index]
+                            : 1;
+                        
+                        const barDurationInQuarters = parsed.barDurations && parsed.barDurations[index]
+                            ? parsed.barDurations[index]
+                            : 2;
+                        
+                        const restDurationInQuarters = barDurationInQuarters - chordDurationInQuarters;
+                        
+                        const chordDuration = getMidiDuration(chordDurationInQuarters);
+
+                        // Добавляем аккорд
+                        const noteEvent = new MidiWriter.NoteEvent({
+                            pitch: midiPitches,
+                            duration: chordDuration,
+                            velocity: 80
+                        });
+                        track.addEvent(noteEvent);
+
+                        // Добавляем паузу, если такт не заполнен полностью
+                        if (restDurationInQuarters > 0) {
+                            const restDuration = getMidiDuration(restDurationInQuarters);
+                            const restEvent = new MidiWriter.NoteEvent({
+                                pitch: [],
+                                duration: restDuration,
+                                velocity: 0
+                            });
+                            track.addEvent(restEvent);
+                        }
+                    }
+                }
+            });
+
+            const write = new MidiWriter.Writer([track]);
+            const midiData = write.buildFile();
+
+            const blob = new Blob([midiData], { type: 'audio/midi' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${parsedData.title || 'song'}.mid`;
+            link.click();
+            URL.revokeObjectURL(url);
+
+            let message = `MIDI файл создан!\n`;
+            message += `Аккордов обработано: ${validChords.length}\n`;
+            message += `Темп: ${parsed.tempo} BPM\n`;
+            if (unknownChords.size > 0) {
+                message += `Пропущено неизвестных аккордов: ${unknownChords.size}`;
+            }
+            
+            console.log(message);
+            alert(message);
+        } catch (err) {
+            console.error('MIDI conversion error:', err);
+            const errorMessage = 'Ошибка при создании MIDI файла: ' + err.message;
+            console.log(errorMessage);
+            alert(errorMessage);
+        }
+    };
+
+    const handlePreviewChords = () => {
+        if (!parsedData || !inputText) {
+            const message = 'Нет данных для проверки!';
+            console.log(message);
+            alert(message);
+            return;
+        }
+
+        try {
+            const parsed = parseABCForMIDI(inputText);
+            const overrides = parseChordOverrides(options.chordOverrides || '', midiNotes);
+            const chordNotes = mergeChords(defaultChordNotes, overrides);
+
+            const chordStats = {};
+            const unknownChords = new Set();
+
+            for (let chord of parsed.chords) {
+                if (chordNotes[chord]) {
+                    chordStats[chord] = (chordStats[chord] || 0) + 1;
+                } else {
+                    unknownChords.add(chord);
+                }
+            }
+
+            let previewText = '=== РЕЗУЛЬТАТ ПАРСИНГА ===\n\n';
+            previewText += `Темп: ${parsed.tempo} BPM\n`;
+            previewText += `Размер: ${parsed.meter}\n`;
+            previewText += `Всего аккордов: ${parsed.chords.length}\n`;
+            previewText += `Уникальных аккордов: ${Object.keys(chordStats).length}\n\n`;
+
+            if (unknownChords.size > 0) {
+                previewText += `⚠️ НЕОПРЕДЕЛЕННЫЕ АККОРДЫ: ${Array.from(unknownChords).join(', ')}\n\n`;
+            }
+
+            previewText += 'Аккорды в песне (с количеством вхождений):\n';
+
+            const sortedChords = Object.entries(chordStats)
+                .sort((a, b) => b[1] - a[1]);
+
+            for (let [chord, count] of sortedChords) {
+                const info = chordNotes[chord];
+                const source = info && info.name.includes('Пользовательский') ? ' (польз.)' : '';
+                previewText += `${chord}: ${count} раз - ${info ? info.notes.join(', ') : '???'}${source}\n`;
+            }
+
+            if (Object.keys(overrides).length > 0) {
+                previewText += '\nПользовательские определения аккордов:\n';
+                for (let [chord, info] of Object.entries(overrides)) {
+                    previewText += `${chord}: ${info.notes.join(', ')}\n`;
+                }
+            }
+
+            console.log(previewText);
+            alert(previewText);
+        } catch (err) {
+            console.error('Preview error:', err);
+            const errorMessage = 'Ошибка при проверке аккордов: ' + err.message;
+            console.log(errorMessage);
+            alert(errorMessage);
+        }
+    };
+
     return (
         <div className="App">
             <Layout
@@ -169,6 +373,15 @@ K: Ab
                         options={options}
                         onOptionsChange={handleOptionsChange}
                         onGeneratePdf={handleGeneratePdf}
+                        onConvertToMIDI={handleConvertToMIDI}
+                        onPreviewChords={handlePreviewChords}
+                        onTogglePlayback={togglePlayback}
+                        onStopPlayback={stopPlayback}
+                        isPlaying={isPlaying}
+                        isPaused={isPaused}
+                        currentTime={currentTime}
+                        totalTime={totalTime}
+                        progress={progress}
                         loading={loading}
                         hasData={!!parsedData}
                     />
