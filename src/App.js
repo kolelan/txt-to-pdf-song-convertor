@@ -53,7 +53,8 @@ K: Ab
         staffLineSpacing: 3,
         staffSpacing: 16,
         staffVerticalOffset: 0,
-        staffLineWidth: 0.35
+        staffLineWidth: 0.35,
+        staffLineCount: 5
     });
     useEffect(() => {
         try {

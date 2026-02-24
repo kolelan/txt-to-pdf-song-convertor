@@ -16,6 +16,7 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
     const staffSpacingOptions = [1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30];
     const staffVerticalOffsetOptions = [-10, -8, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 10];
     const staffLineWidthOptions = [0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0];
+    const staffLineCountOptions = [3, 4, 5, 6, 7, 8];
     const fontFamilyOptions = ['Roboto Mono', 'PT Mono', 'Courier', 'Helvetica'];
     const fontStyleOptions = [
         { value: 'normal', label: 'Normal' },
@@ -178,6 +179,21 @@ const Controls = ({ options, onOptionsChange, onGeneratePdf, loading, hasData })
                         </div>
                         {options.showStaff && (
                             <>
+                                <div className="control-item">
+                                    <label>
+                                        <span>Количество линий:</span>
+                                        <select
+                                            value={options.staffLineCount !== undefined ? options.staffLineCount : 5}
+                                            onChange={(e) => handleOptionChange('staffLineCount', parseInt(e.target.value))}
+                                        >
+                                            {staffLineCountOptions.map(count => (
+                                                <option key={count} value={count}>
+                                                    {count} линий
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
                                 <div className="control-item">
                                     <label>
                                         <span>Расстояние между линиями нотного стана:</span>

@@ -6,15 +6,16 @@ import { getBarStatistics } from './barCounter';
 // y - позиция верхней линии стана (базовая линия текста аккордов)
 // lineSpacing - расстояние между линиями
 // lineWidth - толщина линий
-const drawStaff = (doc, x, y, width, lineSpacing = 3, lineWidth = 0.35) => {
+// lineCount - количество линий (3-8, по умолчанию 5)
+const drawStaff = (doc, x, y, width, lineSpacing = 3, lineWidth = 0.35, lineCount = 5) => {
   // Сохраняем текущую толщину линии
   const currentLineWidth = doc.getLineWidth();
   // Устанавливаем толщину линий нотного стана
   doc.setLineWidth(lineWidth);
   
-  // Рисуем 5 горизонтальных линий нотного стана на равном расстоянии
+  // Рисуем указанное количество горизонтальных линий нотного стана на равном расстоянии
   // Верхняя линия на позиции y, остальные ниже
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < lineCount; i++) {
     const lineY = y + (i * lineSpacing);
     doc.line(x, lineY, x + width, lineY);
   }
@@ -92,17 +93,18 @@ export const generatePdf = async (parsedData, options) => {
               const staffWidth = 120; // Ширина нотного стана
               const staffLineSpacing = options.staffLineSpacing || 3; // Расстояние между линиями внутри стана
               const staffLineWidth = options.staffLineWidth !== undefined ? options.staffLineWidth : 0.35; // Толщина линий
+              const staffLineCount = options.staffLineCount !== undefined ? options.staffLineCount : 5; // Количество линий
               // Базовый сдвиг вверх 5px + настраиваемый сдвиг из опций
               const baseOffset = -5; // Базовый сдвиг вверх на 5px
               const customOffset = options.staffVerticalOffset !== undefined ? options.staffVerticalOffset : 0;
               const totalOffset = baseOffset + customOffset;
               const staffY = yPosition + totalOffset; // Позиция по Y с учетом сдвига (верхняя линия стана)
               const staffX = fixedTextOffset; // Позиция по X (там же, где обычно текст)
-              drawStaff(doc, staffX, staffY, staffWidth, staffLineSpacing, staffLineWidth);
+              drawStaff(doc, staffX, staffY, staffWidth, staffLineSpacing, staffLineWidth, staffLineCount);
               
               // Используем специальное расстояние между станами
-              // Учитываем высоту стана (4 промежутка между 5 линиями) + дополнительное расстояние
-              const staffHeight = 4 * staffLineSpacing; // Высота стана (4 промежутка между 5 линиями)
+              // Учитываем высоту стана (количество промежутков = количество линий - 1) + дополнительное расстояние
+              const staffHeight = (staffLineCount - 1) * staffLineSpacing; // Высота стана (промежутки между линиями)
               const staffSpacing = options.staffSpacing || 16;
               yPosition += staffHeight + staffSpacing; // Перемещаемся на высоту стана + расстояние до следующего
             } else if (options.showLyrics && measure.lyrics) {
