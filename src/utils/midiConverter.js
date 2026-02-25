@@ -259,7 +259,8 @@ export function parseABCForMIDI(text) {
         if (line === '') continue;
         
         if (line.startsWith('Q:')) {
-            const match = line.match(/Q:(\d+)/);
+            // Поддерживаем формат Q:69 или Q: 69 (с пробелом)
+            const match = line.match(/Q:\s*(\d+)/);
             if (match) tempo = parseInt(match[1]);
         }
         else if (line.startsWith('M:')) {

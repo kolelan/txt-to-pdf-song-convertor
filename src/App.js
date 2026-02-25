@@ -24,7 +24,7 @@ function App() {
 T: Будь спокоен
 M: 2/4
 L: 2/4
-Q: 79
+Q: 69
 R: A.Litvinenko / Nicotine Trip
 K: Gm 
 
