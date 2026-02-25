@@ -2,6 +2,44 @@ import React from 'react';
 import { formatTime, defaultChordNotes } from '../../utils/midiConverter';
 import './Controls.css';
 
+// Функция для генерации placeholder с примерами аккордов от C (только чистая нота C, без диезов и бемолей)
+const getChordPlaceholder = () => {
+    // Функция для сортировки аккордов: сначала мажор/минор, потом септаккорды
+    const getSortOrder = (chord) => {
+        if (chord === 'C') return 1;
+        if (chord === 'Cm') return 2;
+        if (chord.includes('maj7')) return 3;
+        if (chord.includes('m7') && !chord.includes('m7b5')) return 4;
+        if (chord.endsWith('7') && !chord.includes('m7') && !chord.includes('maj7') && !chord.includes('dim7') && !chord.includes('aug7')) return 5;
+        if (chord.includes('dim7')) return 6;
+        if (chord.includes('m7b5')) return 7;
+        if (chord.includes('aug7')) return 8;
+        return 9;
+    };
+    
+    // Фильтруем только аккорды от чистой ноты C (без C# и Cb)
+    const cChords = Object.keys(defaultChordNotes)
+        .filter(chord => chord.startsWith('C') && !chord.startsWith('C#') && !chord.startsWith('Cb'))
+        .sort((a, b) => {
+            const orderA = getSortOrder(a);
+            const orderB = getSortOrder(b);
+            if (orderA !== orderB) return orderA - orderB;
+            return a.localeCompare(b);
+        });
+    
+    let placeholder = 'Название_аккорда Нота1 Нота2 Нота3 ....\n';
+    
+    // Добавляем только аккорды от чистой ноты C
+    cChords.forEach(chord => {
+        const chordInfo = defaultChordNotes[chord];
+        if (chordInfo && chordInfo.notes) {
+            placeholder += `${chord} ${chordInfo.notes.join(' ')}\n`;
+        }
+    });
+    
+    return placeholder.trim();
+};
+
 // Функция для получения списка предопределенных аккордов, сгруппированных по типам
 const getChordLegend = () => {
     const chords = Object.keys(defaultChordNotes);
@@ -474,8 +512,8 @@ const Controls = ({
                                 <textarea
                                     value={options.chordOverrides || ''}
                                     onChange={(e) => handleOptionChange('chordOverrides', e.target.value)}
-                                    placeholder="Gm G3 Bb3 D3&#10;G G3 B3 D3&#10;Формат: Название_аккорда нота1 нота2 нота3 ..."
-                                    rows={6}
+                                    placeholder={getChordPlaceholder()}
+                                    rows={12}
                                     style={{
                                         width: '100%',
                                         fontFamily: 'monospace',
