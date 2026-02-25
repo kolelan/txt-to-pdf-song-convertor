@@ -171,6 +171,7 @@ export function useMidiPlayer(inputText, chordOverrides) {
                     `Продолжить с доступными аккордами?`;
                 console.log(confirmMessage);
                 const proceed = window.confirm(confirmMessage);
+                console.log(`Пользователь выбрал: ${proceed ? 'Продолжить' : 'Отмена'}`);
                 if (!proceed || validChords.length === 0) {
                     return;
                 }

@@ -1,6 +1,146 @@
 import React from 'react';
-import { formatTime } from '../../utils/midiConverter';
+import { formatTime, defaultChordNotes } from '../../utils/midiConverter';
 import './Controls.css';
+
+// Функция для получения списка предопределенных аккордов, сгруппированных по типам
+const getChordLegend = () => {
+    const chords = Object.keys(defaultChordNotes);
+    
+    // Группируем аккорды по типам
+    const groups = {
+        major: [],
+        minor: [],
+        maj7: [],
+        m7: [],
+        dom7: [],
+        dim7: [],
+        m7b5: [],
+        aug7: [],
+        other: []
+    };
+    
+    chords.forEach(chord => {
+        if (chord.endsWith('maj7')) {
+            groups.maj7.push(chord);
+        } else if (chord.endsWith('m7b5')) {
+            groups.m7b5.push(chord);
+        } else if (chord.endsWith('dim7')) {
+            groups.dim7.push(chord);
+        } else if (chord.endsWith('aug7')) {
+            groups.aug7.push(chord);
+        } else if (chord.endsWith('m7')) {
+            groups.m7.push(chord);
+        } else if (chord.endsWith('7')) {
+            groups.dom7.push(chord);
+        } else if (chord.endsWith('m')) {
+            groups.minor.push(chord);
+        } else if (!chord.includes('m') && !chord.includes('7') && !chord.includes('dim') && !chord.includes('aug')) {
+            groups.major.push(chord);
+        } else {
+            groups.other.push(chord);
+        }
+    });
+    
+    return groups;
+};
+
+// Компонент для отображения легенды предопределенных аккордов
+const ChordLegend = () => {
+    const chordGroups = getChordLegend();
+    const [isExpanded, setIsExpanded] = React.useState(false);
+    
+    const totalChords = Object.values(chordGroups).reduce((sum, group) => sum + group.length, 0);
+    
+    return (
+        <div style={{ marginTop: '8px', fontSize: '13px', color: '#666' }}>
+            <div 
+                style={{ 
+                    cursor: 'pointer', 
+                    color: '#0066cc', 
+                    textDecoration: 'underline',
+                    marginBottom: '5px',
+                    fontSize: '13px'
+                }}
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
+                {isExpanded ? '▼' : '▶'} Предопределено аккордов: {totalChords} (нажмите для просмотра)
+            </div>
+            {isExpanded && (
+                <div style={{ 
+                    marginTop: '8px', 
+                    padding: '10px', 
+                    backgroundColor: '#f9f9f9', 
+                    border: '1px solid #ddd', 
+                    borderRadius: '4px',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    fontSize: '12px',
+                    lineHeight: '1.5'
+                }}>
+                    <div style={{ marginBottom: '8px', fontWeight: 'bold', color: '#333' }}>
+                        💡 Вы можете переопределить любой из этих аккордов, указав его название и новые ноты.
+                    </div>
+                    {chordGroups.major.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Мажорные:</strong> {chordGroups.major.slice(0, 20).join(', ')}
+                            {chordGroups.major.length > 20 && ` ... (+${chordGroups.major.length - 20})`}
+                        </div>
+                    )}
+                    {chordGroups.minor.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Минорные:</strong> {chordGroups.minor.slice(0, 20).join(', ')}
+                            {chordGroups.minor.length > 20 && ` ... (+${chordGroups.minor.length - 20})`}
+                        </div>
+                    )}
+                    {chordGroups.maj7.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Major 7th (maj7):</strong> {chordGroups.maj7.slice(0, 15).join(', ')}
+                            {chordGroups.maj7.length > 15 && ` ... (+${chordGroups.maj7.length - 15})`}
+                        </div>
+                    )}
+                    {chordGroups.m7.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Minor 7th (m7):</strong> {chordGroups.m7.slice(0, 15).join(', ')}
+                            {chordGroups.m7.length > 15 && ` ... (+${chordGroups.m7.length - 15})`}
+                        </div>
+                    )}
+                    {chordGroups.dom7.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Dominant 7th (7):</strong> {chordGroups.dom7.slice(0, 15).join(', ')}
+                            {chordGroups.dom7.length > 15 && ` ... (+${chordGroups.dom7.length - 15})`}
+                        </div>
+                    )}
+                    {chordGroups.dim7.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Diminished 7th (dim7):</strong> {chordGroups.dim7.slice(0, 15).join(', ')}
+                            {chordGroups.dim7.length > 15 && ` ... (+${chordGroups.dim7.length - 15})`}
+                        </div>
+                    )}
+                    {chordGroups.m7b5.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Half-diminished 7th (m7b5):</strong> {chordGroups.m7b5.slice(0, 15).join(', ')}
+                            {chordGroups.m7b5.length > 15 && ` ... (+${chordGroups.m7b5.length - 15})`}
+                        </div>
+                    )}
+                    {chordGroups.aug7.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Augmented 7th (aug7):</strong> {chordGroups.aug7.slice(0, 15).join(', ')}
+                            {chordGroups.aug7.length > 15 && ` ... (+${chordGroups.aug7.length - 15})`}
+                        </div>
+                    )}
+                    {chordGroups.other.length > 0 && (
+                        <div style={{ marginBottom: '6px' }}>
+                            <strong>Другие:</strong> {chordGroups.other.join(', ')}
+                        </div>
+                    )}
+                    <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #ddd', fontStyle: 'italic', color: '#888' }}>
+                        <strong>Пример переопределения:</strong> Cm C2 Eb2 G2 (переопределит стандартный Cm)
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
 
 const Controls = ({ 
     options, 
@@ -346,6 +486,7 @@ const Controls = ({
                                         resize: 'vertical'
                                     }}
                                 />
+                                <ChordLegend />
                             </label>
                         </div>
                     </div>

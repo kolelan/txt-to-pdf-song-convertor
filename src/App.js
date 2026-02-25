@@ -21,24 +21,64 @@ import Footer from "./components/Footer/Footer";
 
 function App() {
     const [inputText, setInputText] = useState(`X: 1
-T: White smoke
-M: 4/4
-L: 1/4
-Q:110
-R: G. Stepenko / N. Yarkov
-K: Ab 
- % Intro
-||: Ab |  Eb | Bb | Db :||
-% Verse 1
-| Ab | Eb | % An iron needle will pierce my vein
-| Bb | Db | % And dissolve in blood
-| Ab | Eb | % All the medicine that you gave me
-| Bb | Db | % Into the silence a whisper shud
-% Chorus
-| Ab | Cmb | % Burn, burn white smoke
-| Fm | Eb | % Run away my spirit broke
-% Solo
-| Ab | Eb | Bb | Db |`);
+T: Будь спокоен
+M: 2/4
+L: 2/4
+Q: 79
+R: A.Litvinenko / Nicotine Trip
+K: Gm 
+
+% Вступление
+| Gm | Bb | Eb | D  |
+| Gm | Bb | Eb | D  |
+| Gm | Bb | Eb | D  |
+| Gm | Bb | Eb | D  |
+
+% Тихая часть куплет 1
+| Gm | Bb | Eb | D  | % Почти спустился розовый закат
+| Gm | Bb | Eb | D  | % Ты приходил в сознанье много дней подряд
+| Gm | Bb | Eb | D  | % Очнувшись среди ночи сердце бьется сквозь туман
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+
+% Мощная часть куплет 1
+| Gm | Bb | Eb | D  | % Над банкой с папиросами чудит веселый смог
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Поменялось все местами стены, пол и потолок
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Здесь последние пять дней ты гонял своих чертей!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+
+% Припев
+| Eb | Eb | F  | F  | % Дело не в тебе, жизнь все расставит по местам.
+| Bb | Bb | G  | G  | % В этой гребаной беде виноват ты только сам.
+| Eb | Eb | F  | F  | % Будь бесстрашным, будь веселым, будь самим собой!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+
+% Куплет 2
+| Gm | Bb | Eb | D  | % Хитрый бес кругами ходит матерится невпопад!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Говорит, что жизнь твоя не ад, а лишь твоя дорога в ад!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Взглядом светлым обведи круг вокруг себя!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+| Gm | Bb | Eb | D  | % Бес повержен, в пол рогами уперся и кричит! 
+| Gm | Bb | Eb | D  | % Ты спокойствием его сразил, как будто это меч и щит!
+| Gm | Bb | Eb | D  | % Сдерни шторы! В окнах солнце увидит мозг больной!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен...
+
+% Припев
+| Eb | Eb | F  | F  | % Дело не в тебе, жизнь все расставит по местам.
+| Bb | Bb | G  | G  | % В этой гребаной беде виноват ты только сам.
+| Eb | Eb | F  | F  | % Будь бесстрашным, будь веселым, будь самим собой!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb | Eb | D  | % Будь спокоен, будь спокоен!
+| Gm | Bb |           % Я спокоен...
+`);
 
     const [parsedData, setParsedData] = useState(null);
     const [barStatistics, setBarStatistics] = useState(null); // Добавляем состояние для статистики
@@ -192,6 +232,7 @@ K: Ab
                     `Продолжить с доступными аккордами?`;
                 console.log(confirmMessage);
                 const proceed = window.confirm(confirmMessage);
+                console.log(`Пользователь выбрал: ${proceed ? 'Продолжить' : 'Отмена'}`);
                 if (!proceed || validChords.length === 0) {
                     return;
                 }
