@@ -280,19 +280,42 @@ export function parseABCForMIDI(text) {
             }
         }
         else if (line.includes('|')) {
+            // Отбрасываем комментарий после символа '%'
             const chordLine = line.split('%')[0].trim();
-            
+
+            if (!chordLine.includes('|')) {
+                continue;
+            }
+
+            // Длительность одного "базового" аккорда (из L:) в четвертях
             const chordDurationInQuarters = (noteLengthNumerator / noteLengthDenominator) * 4;
+            // Длительность целого такта в четвертях (из M:)
             const barDurationInQuarters = (meterNumerator / meterDenominator) * 4;
-            
-            const parts = chordLine.split('|');
-            
-            for (let part of parts) {
-                const chord = part.trim();
-                if (chord && chord !== '') {
+
+            // Делим строку на такты
+            const bars = chordLine.split('|');
+
+            for (let rawBar of bars) {
+                const barContent = rawBar.trim();
+                if (!barContent) continue;
+
+                // Внутри такта может быть несколько аккордов, разделённых пробелами.
+                // Внутри одного аккорда пробелов быть не может.
+                const barChords = barContent.split(/\s+/).filter(Boolean);
+                if (barChords.length === 0) continue;
+
+                // Длительность части такта, "приходящаяся" на один аккорд.
+                // Если, например, M: 2/4 и L: 1/4, то:
+                // - barDurationInQuarters = 2 (две четверти в такте)
+                // - chordDurationInQuarters = 1 (одна четверть на аккорд)
+                // - при двух аккордах в такте barDurationPerChord = 1,
+                //   тогда пауза внутри такта = 0 и такт заполняется ровно двумя аккордами.
+                const barDurationPerChord = barDurationInQuarters / barChords.length;
+
+                for (let chord of barChords) {
                     chords.push(chord);
                     chordDurations.push(chordDurationInQuarters);
-                    barDurations.push(barDurationInQuarters);
+                    barDurations.push(barDurationPerChord);
                 }
             }
         }
